@@ -1,0 +1,1877 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #0d0f1a;
+        --surface: rgba(22, 26, 46, 0.95);
+        --surface2: rgba(30, 36, 60, 0.88);
+        --border: rgba(255, 255, 255, 0.09);
+        --accent: #7c6af7;
+        --accent2: #f76a8a;
+        --accent3: #6af7c0;
+        --text: #e8eaf6;
+        --text2: #8892b0;
+        --text3: #4a5580;
+        --danger: #f76a8a;
+        --success: #6af7c0;
+        --warn: #f7c46a;
+        --radius: 14px;
+        --radius-sm: 8px;
+        --font-display: "Syne", sans-serif;
+        --font-mono: "Space Mono", monospace;
+        --shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+      }
+      [data-theme="light"] {
+        --bg: #f0f2ff;
+        --surface: rgba(255, 255, 255, 0.96);
+        --surface2: rgba(240, 242, 255, 0.92);
+        --border: rgba(0, 0, 0, 0.09);
+        --accent: #5d4ef5;
+        --accent2: #e84469;
+        --accent3: #1abf8a;
+        --text: #1a1d36;
+        --text2: #4a5080;
+        --text3: #9098c0;
+        --shadow: 0 8px 40px rgba(100, 100, 200, 0.18);
+      }
+      [data-theme="light"] select option {
+        background: #f0f2ff;
+      }
+
+      body {
+        font-family: var(--font-display);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        transition:
+          background 0.4s,
+          color 0.3s;
+        overflow-x: hidden;
+      }
+      #bgLayer {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background-size: cover;
+        background-position: center;
+        transition: background-image 1s ease;
+      }
+      #bgLayer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        opacity: 0.75;
+        transition: opacity 0.5s;
+      }
+      body.bg-on #bgLayer::after {
+        opacity: 0.5;
+      }
+
+      #app {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 330px 1fr;
+        gap: 18px;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 20px 14px;
+        min-height: 100vh;
+        align-items: start;
+      }
+      @media (max-width: 760px) {
+        #app {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        padding: 20px;
+        transition:
+          background 0.3s,
+          border 0.3s;
+      }
+      .card + .card {
+        margin-top: 14px;
+      }
+
+      .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .app-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .header-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .icon-btn {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        color: var(--text2);
+      }
+      .icon-btn:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+        transform: scale(1.07);
+      }
+
+      .field-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 7px;
+      }
+      .field-group {
+        margin-bottom: 16px;
+      }
+
+      .time-row {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      select {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        padding: 7px 9px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+        outline: none;
+        appearance: none;
+        text-align: center;
+      }
+      select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+      }
+      .sep {
+        color: var(--text3);
+        font-family: var(--font-mono);
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      .btn {
+        font-family: var(--font-display);
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        padding: 9px 16px;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #6a59e0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px
+          color-mix(in srgb, var(--accent) 40%, transparent);
+      }
+      .btn-danger {
+        background: rgba(247, 106, 138, 0.13);
+        color: var(--danger);
+        border: 1px solid rgba(247, 106, 138, 0.28);
+      }
+      .btn-danger:hover {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-ghost {
+        background: var(--surface2);
+        color: var(--text2);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 7px;
+      }
+
+      .timer-display {
+        text-align: center;
+        padding: 18px 0 10px;
+      }
+      .timer-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 5px;
+      }
+      .timer-value {
+        font-family: var(--font-mono);
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 2px;
+        transition: color 0.5s;
+      }
+      .timer-value.urgent {
+        color: var(--warn);
+      }
+      .timer-value.overtime {
+        color: var(--danger);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.55;
+        }
+      }
+      .pulsing {
+        animation: pulse 1.2s ease infinite;
+      }
+
+      .progress-ring-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 4px 0 14px;
+      }
+      .progress-ring {
+        transform: rotate(-90deg);
+      }
+      .ring-bg {
+        fill: none;
+        stroke: var(--border);
+        stroke-width: 6;
+      }
+      .ring-fg {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 6;
+        stroke-linecap: round;
+        transition:
+          stroke-dashoffset 1s linear,
+          stroke 0.5s;
+      }
+
+      .stats-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 10px;
+      }
+      .stat-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 11px;
+        text-align: center;
+      }
+      .stat-label {
+        font-size: 0.62rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 3px;
+      }
+      .stat-value {
+        font-family: var(--font-mono);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .stat-value.green {
+        color: var(--success);
+      }
+      .stat-value.pink {
+        color: var(--accent2);
+      }
+
+      .break-item {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        margin-bottom: 9px;
+      }
+      .break-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 9px;
+      }
+      .break-tag {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .break-remove {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--danger);
+        font-size: 0.95rem;
+        padding: 2px 5px;
+        border-radius: 4px;
+      }
+      .break-remove:hover {
+        background: rgba(247, 106, 138, 0.15);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .tab-btn {
+        font-family: var(--font-display);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        padding: 7px 13px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        background: var(--surface2);
+        color: var(--text2);
+        transition: all 0.2s;
+      }
+      .tab-btn.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      .history-item {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        margin-bottom: 9px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: border 0.2s;
+      }
+      .history-item:hover {
+        border-color: var(--accent);
+      }
+      .history-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .history-dot.on-time {
+        background: var(--success);
+      }
+      .history-dot.overtime {
+        background: var(--danger);
+      }
+      .history-details {
+        flex: 1;
+      }
+      .history-date {
+        font-size: 0.7rem;
+        color: var(--text3);
+        font-family: var(--font-mono);
+      }
+      .history-times {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-top: 2px;
+      }
+      .history-badge {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+      .badge-on-time {
+        background: rgba(106, 247, 192, 0.14);
+        color: var(--success);
+      }
+      .badge-overtime {
+        background: rgba(247, 106, 138, 0.14);
+        color: var(--danger);
+      }
+      .history-empty {
+        text-align: center;
+        color: var(--text3);
+        padding: 36px 20px;
+        font-size: 0.88rem;
+        line-height: 1.6;
+      }
+
+      .toggle {
+        position: relative;
+        width: 42px;
+        height: 22px;
+      }
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-track {
+        position: absolute;
+        inset: 0;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .toggle-track::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--text3);
+        left: 2px;
+        top: 2px;
+        transition: 0.3s;
+      }
+      .toggle input:checked + .toggle-track {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .toggle input:checked + .toggle-track::after {
+        transform: translateX(20px);
+        background: #fff;
+      }
+
+      .notif-item {
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .notif-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .notif-text {
+        font-size: 0.83rem;
+        color: var(--text2);
+        flex: 1;
+      }
+      .notif-time {
+        font-size: 0.68rem;
+        color: var(--text3);
+        font-family: var(--font-mono);
+        white-space: nowrap;
+      }
+
+      .wp-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 14px;
+      }
+      .wp-cat-btn {
+        font-family: var(--font-display);
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 5px 13px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        cursor: pointer;
+        background: var(--surface2);
+        color: var(--text2);
+        transition: all 0.2s;
+      }
+      .wp-cat-btn.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .wp-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        margin-bottom: 12px;
+      }
+      .wp-thumb {
+        aspect-ratio: 16/9;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        background-size: cover;
+        background-position: center;
+        transition: all 0.2s;
+      }
+      .wp-thumb:hover,
+      .wp-thumb.active {
+        border-color: var(--accent);
+        transform: scale(1.04);
+      }
+      .wp-toggle-label {
+        font-size: 0.8rem;
+        color: var(--text2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Color theme picker */
+      .theme-swatches {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .swatch {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .swatch:hover {
+        transform: scale(1.15);
+      }
+      .swatch.active {
+        border-color: var(--text);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+      }
+
+      #toast-container {
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .toast {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 11px 16px;
+        box-shadow: var(--shadow);
+        font-size: 0.83rem;
+        backdrop-filter: blur(24px);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        animation: slideIn 0.3s ease;
+        min-width: 230px;
+      }
+      .toast.success {
+        border-left: 3px solid var(--success);
+      }
+      .toast.warn {
+        border-left: 3px solid var(--warn);
+      }
+      .toast.danger {
+        border-left: 3px solid var(--danger);
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(60px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(60px);
+          opacity: 0;
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: var(--font-display);
+        font-size: 0.83rem;
+        padding: 7px 11px;
+        border-radius: var(--radius-sm);
+        outline: none;
+        transition: border 0.2s;
+      }
+      input[type="text"]:focus {
+        border-color: var(--accent);
+      }
+
+      /* Live clock */
+      #liveClock {
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: var(--text2);
+        margin-bottom: 12px;
+        text-align: right;
+        padding: 5px 10px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        letter-spacing: 1px;
+      }
+      #liveDate {
+        color: var(--text3);
+        font-size: 0.72rem;
+        margin-left: 6px;
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="bgLayer"></div>
+    <div id="app">
+      <!-- LEFT PANEL -->
+      <div class="left-panel">
+        <div class="card">
+          <div class="app-header">
+            <div class="app-title">⏱ ETimeTracker</div>
+            <div class="header-actions">
+              <div
+                class="icon-btn"
+                id="themeBtn"
+                title="Toggle Theme"
+                onclick="toggleTheme()"
+              >
+                🌙
+              </div>
+              <div
+                class="icon-btn"
+                title="Enable Notifications"
+                onclick="requestNotifPerm()"
+              >
+                🔔
+              </div>
+            </div>
+          </div>
+          <!-- Live clock -->
+          <div id="liveClock">--:--:--<span id="liveDate"></span></div>
+          <!-- Format toggle -->
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: flex-end;
+              gap: 8px;
+              margin-bottom: 14px;
+            "
+          >
+            <span style="font-size: 0.73rem; color: var(--text3)">24h</span>
+            <label class="toggle"
+              ><input
+                type="checkbox"
+                id="toggleFormat"
+                onchange="onFormatChange()" /><span class="toggle-track"></span
+            ></label>
+          </div>
+          <!-- Clock In -->
+          <div class="field-group">
+            <div class="field-label">🏢 Clock In</div>
+            <div class="time-row" id="clockInSelectors"></div>
+          </div>
+          <!-- Working Hours -->
+          <div class="field-group">
+            <div class="field-label">⏳ Working Hours</div>
+            <div class="time-row" id="workHoursSelectors"></div>
+          </div>
+          <!-- Breaks -->
+          <div class="field-group">
+            <div class="field-label">☕ Breaks</div>
+            <div id="breaksContainer"></div>
+            <div class="btn-row">
+              <button class="btn btn-ghost" onclick="addBreak()">
+                + Add Break
+              </button>
+            </div>
+          </div>
+          <!-- Note -->
+          <div class="field-group">
+            <div class="field-label">📝 Note (optional)</div>
+            <input
+              type="text"
+              id="noteInput"
+              placeholder="e.g. Working from home..."
+            />
+          </div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%; justify-content: center; padding: 11px"
+            onclick="calculate()"
+          >
+            ▶ Calculate
+          </button>
+        </div>
+
+        <!-- Timer Card -->
+        <div class="card" id="timerCard">
+          <div class="timer-display">
+            <div class="timer-label" id="timerLabel">Remaining Time</div>
+            <div class="timer-value" id="remainingTime">--:--:--</div>
+          </div>
+          <div class="progress-ring-wrap">
+            <svg
+              class="progress-ring"
+              width="108"
+              height="108"
+              viewBox="0 0 108 108"
+            >
+              <circle class="ring-bg" cx="54" cy="54" r="46" />
+              <circle
+                class="ring-fg"
+                id="progressRing"
+                cx="54"
+                cy="54"
+                r="46"
+                stroke-dasharray="289.0"
+                stroke-dashoffset="289.0"
+              />
+            </svg>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-label">End Time</div>
+              <div class="stat-value" id="endTime">--:--</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Break Total</div>
+              <div class="stat-value green" id="breakTime">0m</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Elapsed</div>
+              <div class="stat-value" id="elapsedTime">--:--</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Overtime</div>
+              <div class="stat-value pink" id="overTime">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('history', this)">
+              📋 History
+            </button>
+            <button class="tab-btn" onclick="switchTab('notifications', this)">
+              🔔 Alerts
+            </button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">
+              ⚙️ Settings
+            </button>
+            <button class="tab-btn" onclick="switchTab('wallpaper', this)">
+              🖼 Wallpaper
+            </button>
+            <button class="tab-btn" onclick="switchTab('stats', this)">
+              📊 Stats
+            </button>
+          </div>
+
+          <!-- HISTORY -->
+          <div class="tab-panel active" id="tab-history">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+              "
+            >
+              <div class="field-label" style="margin: 0">Session History</div>
+              <button
+                class="btn btn-danger"
+                style="padding: 5px 11px; font-size: 0.73rem"
+                onclick="clearHistory()"
+              >
+                Clear All
+              </button>
+            </div>
+            <div id="historyList">
+              <div class="history-empty">
+                🕐 No sessions recorded yet.<br />Hit Calculate to start
+                tracking!
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS -->
+          <div class="tab-panel" id="tab-notifications">
+            <div class="field-label" style="margin-bottom: 12px">
+              Alert Settings
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 11px;
+                margin-bottom: 20px;
+              "
+            >
+              <label
+                class="wp-toggle-label"
+                style="justify-content: space-between"
+                ><span>⏰ Notify when time is up</span
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="notifOnEnd"
+                    checked
+                    onchange="saveNotifSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+              ></label>
+              <label
+                class="wp-toggle-label"
+                style="justify-content: space-between"
+                ><span>⚠️ 15-min warning</span
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="notif15"
+                    checked
+                    onchange="saveNotifSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+              ></label>
+              <label
+                class="wp-toggle-label"
+                style="justify-content: space-between"
+                ><span>⚠️ 30-min warning</span
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="notif30"
+                    onchange="saveNotifSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+              ></label>
+              <label
+                class="wp-toggle-label"
+                style="justify-content: space-between"
+                ><span>📢 Hourly check-in</span
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="notifHourly"
+                    onchange="saveNotifSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+              ></label>
+              <label
+                class="wp-toggle-label"
+                style="justify-content: space-between"
+                ><span>🔊 Sound Alerts</span
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="soundAlert"
+                    checked
+                    onchange="saveNotifSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+              ></label>
+            </div>
+            <div class="field-label" style="margin-bottom: 8px">
+              Notification Log
+            </div>
+            <div class="notif-list" id="notifLog">
+              <div class="history-empty" style="padding: 18px 0">
+                No alerts yet.
+              </div>
+            </div>
+          </div>
+
+          <!-- SETTINGS (Theme Color) -->
+          <div class="tab-panel" id="tab-settings">
+            <div class="field-label" style="margin-bottom: 10px">
+              Accent Color
+            </div>
+            <div class="theme-swatches" id="swatchContainer"></div>
+            <div style="margin-top: 20px">
+              <div class="field-label" style="margin-bottom: 10px">
+                App Theme
+              </div>
+              <div style="display: flex; gap: 10px">
+                <button
+                  class="btn btn-ghost"
+                  onclick="setThemeDark()"
+                  id="btnDark"
+                  style="flex: 1; justify-content: center"
+                >
+                  🌙 Dark
+                </button>
+                <button
+                  class="btn btn-ghost"
+                  onclick="setThemeLight()"
+                  id="btnLight"
+                  style="flex: 1; justify-content: center"
+                >
+                  ☀️ Light
+                </button>
+              </div>
+            </div>
+            <div style="margin-top: 20px">
+              <div class="field-label" style="margin-bottom: 8px">
+                Time Format
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span style="font-size: 0.82rem; color: var(--text2)"
+                  >12-hour</span
+                >
+                <label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="toggleFormat2"
+                    onchange="onFormatChange2()" /><span
+                    class="toggle-track"
+                  ></span
+                ></label>
+                <span style="font-size: 0.82rem; color: var(--text2)"
+                  >24-hour</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- WALLPAPER -->
+          <div class="tab-panel" id="tab-wallpaper">
+            <div class="field-label">Background Category</div>
+            <div class="wp-categories" id="wpCategories"></div>
+            <div class="wp-preview-grid" id="wpGrid"></div>
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <label class="wp-toggle-label"
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="bgToggle"
+                    onchange="toggleBg()" /><span
+                    class="toggle-track"
+                  ></span></label
+                >Show Background</label
+              >
+              <label class="wp-toggle-label"
+                ><label class="toggle"
+                  ><input
+                    type="checkbox"
+                    id="bgAutoChange"
+                    onchange="saveBgSettings()" /><span
+                    class="toggle-track"
+                  ></span></label
+                >Auto-change (10 min)</label
+              >
+            </div>
+          </div>
+
+          <!-- STATS -->
+          <div class="tab-panel" id="tab-stats">
+            <div class="field-label" style="margin-bottom: 13px">
+              Work Summary
+            </div>
+            <div class="stats-row" style="margin-bottom: 15px">
+              <div class="stat-card">
+                <div class="stat-label">Total Sessions</div>
+                <div class="stat-value" id="statTotal">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">On-Time Days</div>
+                <div class="stat-value green" id="statOnTime">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Overtime Days</div>
+                <div class="stat-value pink" id="statOT">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg Break</div>
+                <div class="stat-value" id="statAvgBreak">0m</div>
+              </div>
+            </div>
+            <div class="stat-card" style="margin-bottom: 9px">
+              <div class="stat-label">Most Common Clock-In</div>
+              <div class="stat-value" id="statCommonIn">--</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Break Time</div>
+              <div class="stat-value green" id="statTotalBreak">0m</div>
+            </div>
+            <div style="margin-top: 15px">
+              <div class="field-label" style="margin-bottom: 9px">
+                Weekly Overview
+              </div>
+              <canvas id="weekChart" height="120" style="width: 100%"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+      const ACCENT_COLORS = [
+        { name: "Purple", dark: "#7c6af7", light: "#5d4ef5" },
+        { name: "Pink", dark: "#f76a8a", light: "#e84469" },
+        { name: "Teal", dark: "#6af7c0", light: "#1abf8a" },
+        { name: "Blue", dark: "#6ab4f7", light: "#1a6abf" },
+        { name: "Orange", dark: "#f7a06a", light: "#e06820" },
+        { name: "Yellow", dark: "#f7d96a", light: "#c8a000" },
+      ];
+
+      let use24Hour = false,
+        breakCount = 0,
+        timerInterval = null,
+        clockInterval = null;
+      let requiredEndTime = null,
+        clockInTime = null,
+        totalWorkMs = 0;
+      let alertShownEnd = false,
+        alertShown15 = false,
+        alertShown30 = false,
+        lastHourAlert = -1;
+      let isDark = true;
+
+      const S = {
+        history: "ett_history",
+        bg: "ett_bg",
+        notifLog: "ett_notiflog",
+        settings: "ett_settings2",
+        theme: "ett_theme",
+        accentIdx: "ett_accent",
+      };
+
+      function lj(k, fb) {
+        try {
+          return JSON.parse(localStorage.getItem(k)) || fb;
+        } catch {
+          return fb;
+        }
+      }
+      function sj(k, v) {
+        localStorage.setItem(k, JSON.stringify(v));
+      }
+
+      // Live clock
+      function startClock() {
+        clockInterval && clearInterval(clockInterval);
+        function tick() {
+          const n = new Date();
+          const opts = {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: !use24Hour,
+          };
+          document.getElementById("liveClock").innerHTML =
+            n.toLocaleTimeString([], opts) +
+            '<span id="liveDate" style="color:var(--text3);font-size:.72rem;margin-left:8px">' +
+            n.toLocaleDateString([], {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            }) +
+            "</span>";
+        }
+        tick();
+        clockInterval = setInterval(tick, 1000);
+      }
+
+      // Accent colors
+      function initSwatches() {
+        const c = document.getElementById("swatchContainer");
+        c.innerHTML = "";
+        const ai = lj(S.accentIdx, 0);
+        ACCENT_COLORS.forEach((col, i) => {
+          const d = document.createElement("div");
+          d.className = "swatch" + (i === ai ? " active" : "");
+          d.style.background = isDark ? col.dark : col.light;
+          d.title = col.name;
+          d.onclick = () => applyAccent(i);
+          c.appendChild(d);
+        });
+      }
+
+      function applyAccent(i) {
+        sj(S.accentIdx, i);
+        const col = ACCENT_COLORS[i];
+        const v = isDark ? col.dark : col.light;
+        document.documentElement.style.setProperty("--accent", v);
+        initSwatches();
+        showToast("Color: " + col.name, "success");
+      }
+
+      function loadAccent() {
+        const i = lj(S.accentIdx, 0);
+        const col = ACCENT_COLORS[i];
+        document.documentElement.style.setProperty(
+          "--accent",
+          isDark ? col.dark : col.light,
+        );
+      }
+
+      // Theme
+      function setThemeDark() {
+        isDark = true;
+        applyTheme();
+      }
+      function setThemeLight() {
+        isDark = false;
+        applyTheme();
+      }
+      function applyTheme() {
+        document.documentElement.setAttribute(
+          "data-theme",
+          isDark ? "dark" : "light",
+        );
+        document.getElementById("themeBtn").textContent = isDark ? "🌙" : "☀️";
+        sj(S.theme, isDark);
+        loadAccent();
+        initSwatches();
+      }
+      function toggleTheme() {
+        isDark = !isDark;
+        applyTheme();
+      }
+      function loadTheme() {
+        isDark = lj(S.theme, true);
+        applyTheme();
+      }
+
+      // Tabs
+      function switchTab(name, btn) {
+        document
+          .querySelectorAll(".tab-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("tab-" + name).classList.add("active");
+        btn.classList.add("active");
+        if (name === "stats") renderStats();
+        if (name === "settings") initSwatches();
+      }
+
+      // Selectors
+      function createSelect(id, opts, def) {
+        const sel = document.createElement("select");
+        sel.id = id;
+        opts.forEach((o) => {
+          const op = document.createElement("option");
+          op.value = o.value;
+          op.textContent = o.label;
+          if (o.value == def) op.selected = true;
+          sel.appendChild(op);
+        });
+        return sel;
+      }
+      function getHourOpts() {
+        return use24Hour
+          ? Array.from({ length: 24 }, (_, i) => ({
+              value: i,
+              label: i.toString().padStart(2, "0"),
+            }))
+          : Array.from({ length: 12 }, (_, i) => ({
+              value: i + 1,
+              label: (i + 1).toString().padStart(2, "0"),
+            }));
+      }
+      function getMinOpts() {
+        return Array.from({ length: 60 }, (_, i) => ({
+          value: i,
+          label: i.toString().padStart(2, "0"),
+        }));
+      }
+      const ampmOpts = [
+        { value: "AM", label: "AM" },
+        { value: "PM", label: "PM" },
+      ];
+
+      function makeSep() {
+        const s = document.createElement("span");
+        s.className = "sep";
+        s.textContent = ":";
+        return s;
+      }
+
+      function createTimeSelectors(pre, dh, dm, dap) {
+        const w = document.createElement("span");
+        w.className = "time-row";
+        const h = createSelect(pre + "_hour", getHourOpts(), dh);
+        const m = createSelect(pre + "_minute", getMinOpts(), dm);
+        w.appendChild(h);
+        w.appendChild(makeSep());
+        w.appendChild(m);
+        if (!use24Hour) {
+          const a = createSelect(pre + "_ampm", ampmOpts, dap);
+          a.style.minWidth = "58px";
+          w.appendChild(a);
+        }
+        return w;
+      }
+
+      function readTime(pre) {
+        const h = document.getElementById(pre + "_hour");
+        const m = document.getElementById(pre + "_minute");
+        const a = document.getElementById(pre + "_ampm");
+        if (!h || !m) return null;
+        let hr = parseInt(h.value);
+        const mn = parseInt(m.value);
+        if (!use24Hour) {
+          const ap = a ? a.value : "AM";
+          if (ap === "PM" && hr !== 12) hr += 12;
+          if (ap === "AM" && hr === 12) hr = 0;
+        }
+        const n = new Date();
+        return new Date(
+          n.getFullYear(),
+          n.getMonth(),
+          n.getDate(),
+          hr,
+          mn,
+          0,
+          0,
+        );
+      }
+      function readWorkHours() {
+        const h = document.getElementById("workHours_hour");
+        const m = document.getElementById("workHours_minute");
+        if (!h || !m) return 0;
+        return parseInt(h.value) + parseInt(m.value) / 60;
+      }
+
+      function initSelectors() {
+        const ci = document.getElementById("clockInSelectors");
+        const wh = document.getElementById("workHoursSelectors");
+        ci.innerHTML = "";
+        wh.innerHTML = "";
+        const n = new Date();
+        let dh = n.getHours(),
+          dm = n.getMinutes(),
+          dap = "AM";
+        if (!use24Hour) {
+          dap = dh >= 12 ? "PM" : "AM";
+          dh = dh % 12;
+          if (dh === 0) dh = 12;
+        }
+        ci.appendChild(createTimeSelectors("clockIn", dh, dm, dap));
+        const row = document.createElement("span");
+        row.className = "time-row";
+        const hoOpts = Array.from({ length: 25 }, (_, i) => ({
+          value: i,
+          label: i + "h",
+        }));
+        const moOpts = [0, 15, 30, 45].map((m) => ({
+          value: m,
+          label: m + "m",
+        }));
+        row.appendChild(createSelect("workHours_hour", hoOpts, 8));
+        row.appendChild(createSelect("workHours_minute", moOpts, 30));
+        wh.appendChild(row);
+      }
+
+      function onFormatChange() {
+        use24Hour = document.getElementById("toggleFormat").checked;
+        document.getElementById("toggleFormat2").checked = use24Hour;
+        sj(S.settings, { use24Hour });
+        initSelectors();
+        startClock();
+      }
+      function onFormatChange2() {
+        use24Hour = document.getElementById("toggleFormat2").checked;
+        document.getElementById("toggleFormat").checked = use24Hour;
+        sj(S.settings, { use24Hour });
+        initSelectors();
+        startClock();
+      }
+
+      // Breaks
+      function addBreak() {
+        breakCount++;
+        const container = document.getElementById("breaksContainer");
+        const div = document.createElement("div");
+        div.className = "break-item";
+        div.id = "break-" + breakCount;
+        const idx = breakCount;
+        div.innerHTML = `<div class="break-header"><span class="break-tag">Break ${idx}</span><button class="break-remove" onclick="removeBreak(${idx})">✕</button></div>`;
+        const sRow = document.createElement("div");
+        sRow.style.marginBottom = "8px";
+        const sLbl = document.createElement("span");
+        sLbl.style.cssText =
+          "font-size:.68rem;color:var(--text3);display:block;margin-bottom:3px";
+        sLbl.textContent = "Start";
+        sRow.appendChild(sLbl);
+        sRow.appendChild(
+          createTimeSelectors(`break${idx}Start`, use24Hour ? 12 : 12, 0, "PM"),
+        );
+        const eRow = document.createElement("div");
+        const eLbl = document.createElement("span");
+        eLbl.style.cssText =
+          "font-size:.68rem;color:var(--text3);display:block;margin-bottom:3px";
+        eLbl.textContent = "End";
+        eRow.appendChild(eLbl);
+        eRow.appendChild(
+          createTimeSelectors(`break${idx}End`, use24Hour ? 12 : 12, 15, "PM"),
+        );
+        div.appendChild(sRow);
+        div.appendChild(eRow);
+        container.appendChild(div);
+      }
+      function removeBreak(idx) {
+        const el = document.getElementById("break-" + idx);
+        if (el) {
+          el.style.opacity = "0";
+          el.style.transform = "translateX(20px)";
+          el.style.transition = "all .2s";
+          setTimeout(() => el.remove(), 200);
+        }
+      }
+
+      // Calculate
+      function calculate() {
+        clockInTime = readTime("clockIn");
+        if (!clockInTime) {
+          showToast("Invalid clock-in time!", "danger");
+          return;
+        }
+        let totalBreakMs = 0;
+        for (let i = 1; i <= breakCount; i++) {
+          const bEl = document.getElementById("break-" + i);
+          if (!bEl || bEl.style.opacity === "0") continue;
+          const bs = readTime(`break${i}Start`),
+            be = readTime(`break${i}End`);
+          if (!bs || !be) continue;
+          if (be <= bs) {
+            showToast(`Break ${i}: End must be after Start`, "danger");
+            return;
+          }
+          totalBreakMs += be - bs;
+        }
+        const wh = readWorkHours();
+        if (wh <= 0) {
+          showToast("Working hours must be > 0", "danger");
+          return;
+        }
+        totalWorkMs = wh * 3600000;
+        requiredEndTime = new Date(
+          clockInTime.getTime() + totalWorkMs + totalBreakMs,
+        );
+        document.getElementById("endTime").textContent =
+          formatTime(requiredEndTime);
+        const bMin = Math.floor(totalBreakMs / 60000);
+        document.getElementById("breakTime").textContent =
+          bMin > 0 ? `${Math.floor(bMin / 60)}h ${bMin % 60}m` : "0m";
+        alertShownEnd = false;
+        alertShown15 = false;
+        alertShown30 = false;
+        lastHourAlert = -1;
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+        showToast("Tracking started! 🚀", "success");
+        logNotif("🚀", `Session started. End: ${formatTime(requiredEndTime)}`);
+      }
+
+      // Timer
+      const RING_CIRC = 289.0;
+      function updateTimer() {
+        if (!requiredEndTime) return;
+        const now = new Date(),
+          diff = requiredEndTime - now,
+          elapsed = now - clockInTime,
+          total = requiredEndTime - clockInTime;
+        const progress = Math.min(1, Math.max(0, elapsed / total));
+        document.getElementById("elapsedTime").textContent = fmtDuration(
+          Math.max(0, elapsed),
+        );
+        const ring = document.getElementById("progressRing");
+        ring.style.strokeDashoffset = RING_CIRC * (1 - progress);
+        const tv = document.getElementById("remainingTime"),
+          tl = document.getElementById("timerLabel");
+        if (diff < 0) {
+          const ot = -diff;
+          tv.textContent = fmtDuration(ot);
+          tv.className = "timer-value overtime pulsing";
+          tl.textContent = "🔴 Overtime — Go Home!";
+          document.getElementById("overTime").textContent = fmtDuration(ot);
+          ring.style.stroke = "var(--danger)";
+          if (!alertShownEnd) {
+            alertShownEnd = true;
+            sendNotification("⏰ Time Up!", "Your working hours are complete!");
+            showToast("⏰ Time up! Go home!", "danger");
+            logNotif("⏰", "Working hours complete!");
+            playBeep();
+            saveSession();
+          }
+        } else {
+          document.getElementById("overTime").textContent = "--";
+          const mins = diff / 60000;
+          if (
+            mins <= 15 &&
+            !alertShown15 &&
+            document.getElementById("notif15").checked
+          ) {
+            alertShown15 = true;
+            sendNotification("⚠️ 15 Min Left", "Almost done!");
+            showToast("⚠️ 15 minutes remaining", "warn");
+            logNotif("⚠️", "15 minutes remaining");
+            playBeep(440);
+          }
+          if (
+            mins <= 30 &&
+            !alertShown30 &&
+            document.getElementById("notif30").checked
+          ) {
+            alertShown30 = true;
+            sendNotification("⚠️ 30 Min Left", "Half hour left!");
+            showToast("⚠️ 30 minutes remaining", "warn");
+            logNotif("⚠️", "30 minutes remaining");
+          }
+          if (document.getElementById("notifHourly").checked) {
+            const he = Math.floor(elapsed / 3600000);
+            if (he > 0 && he !== lastHourAlert) {
+              lastHourAlert = he;
+              sendNotification("📢 Check-in", `${he} hour(s) elapsed`);
+              logNotif("📢", `${he}h elapsed`);
+            }
+          }
+          if (mins <= 15) {
+            tv.className = "timer-value urgent";
+            ring.style.stroke = "var(--warn)";
+          } else {
+            tv.className = "timer-value";
+            ring.style.stroke = "var(--accent)";
+          }
+          tv.textContent = fmtSec(Math.floor(diff / 1000));
+          tl.textContent = "Remaining Time";
+        }
+      }
+      function fmtSec(ts) {
+        const h = Math.floor(ts / 3600),
+          m = Math.floor((ts % 3600) / 60),
+          s = ts % 60;
+        return `${p(h)}:${p(m)}:${p(s)}`;
+      }
+      function fmtDuration(ms) {
+        const s = Math.floor(ms / 1000),
+          h = Math.floor(s / 3600),
+          m = Math.floor((s % 3600) / 60),
+          sc = s % 60;
+        return `${p(h)}:${p(m)}:${p(sc)}`;
+      }
+      function p(n) {
+        return n.toString().padStart(2, "0");
+      }
+      function formatTime(date) {
+        let h = date.getHours(),
+          m = date.getMinutes();
+        if (use24Hour) return `${p(h)}:${p(m)}`;
+        const ap = h >= 12 ? "PM" : "AM";
+        h = h % 12;
+        if (h === 0) h = 12;
+        return `${p(h)}:${p(m)} ${ap}`;
+      }
+
+      // Notifications
+      function requestNotifPerm() {
+        if (!("Notification" in window)) {
+          showToast("Notifications not supported", "danger");
+          return;
+        }
+        Notification.requestPermission().then((pr) => {
+          if (pr === "granted") {
+            showToast("Notifications enabled! 🔔", "success");
+          } else showToast("Permission denied", "warn");
+        });
+      }
+      function sendNotification(title, body) {
+        if (Notification.permission === "granted")
+          new Notification(title, { body });
+      }
+      function playBeep(freq = 520) {
+        if (!document.getElementById("soundAlert").checked) return;
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.frequency.value = freq;
+          g.gain.setValueAtTime(0.3, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.8);
+        } catch (e) {}
+      }
+      function saveNotifSettings() {}
+
+      function logNotif(icon, text) {
+        const log = lj(S.notifLog, []);
+        log.unshift({ icon, text, time: new Date().toLocaleTimeString() });
+        if (log.length > 20) log.pop();
+        sj(S.notifLog, log);
+        renderNotifLog();
+      }
+      function renderNotifLog() {
+        const el = document.getElementById("notifLog");
+        const log = lj(S.notifLog, []);
+        if (!log.length) {
+          el.innerHTML =
+            '<div class="history-empty" style="padding:18px 0">No alerts yet.</div>';
+          return;
+        }
+        el.innerHTML = log
+          .map(
+            (n) =>
+              `<div class="notif-item"><span class="notif-icon">${n.icon}</span><span class="notif-text">${n.text}</span><span class="notif-time">${n.time}</span></div>`,
+          )
+          .join("");
+      }
+
+      // History
+      function saveSession() {
+        if (!clockInTime || !requiredEndTime) return;
+        const history = lj(S.history, []);
+        const now = new Date();
+        const ot = now > requiredEndTime;
+        history.unshift({
+          date: now.toLocaleDateString(),
+          clockIn: formatTime(clockInTime),
+          endTime: formatTime(requiredEndTime),
+          actualEnd: formatTime(now),
+          overtime: ot,
+          breakMs: totalWorkMs,
+          note: document.getElementById("noteInput").value || "",
+        });
+        if (history.length > 60) history.pop();
+        sj(S.history, history);
+        renderHistory();
+      }
+      function renderHistory() {
+        const list = document.getElementById("historyList");
+        const history = lj(S.history, []);
+        if (!history.length) {
+          list.innerHTML =
+            '<div class="history-empty">🕐 No sessions recorded yet.<br/>Hit Calculate to start tracking!</div>';
+          return;
+        }
+        list.innerHTML = history
+          .map(
+            (h) => `
+    <div class="history-item">
+      <div class="history-dot ${h.overtime ? "overtime" : "on-time"}"></div>
+      <div class="history-details">
+        <div class="history-date">${h.date}${h.note ? " · " + h.note : ""}</div>
+        <div class="history-times">In: ${h.clockIn} → Out: ${h.endTime}</div>
+      </div>
+      <span class="history-badge ${h.overtime ? "badge-overtime" : "badge-on-time"}">${h.overtime ? "Overtime" : "On Time"}</span>
+    </div>`,
+          )
+          .join("");
+      }
+      function clearHistory() {
+        if (!confirm("Clear all session history?")) return;
+        sj(S.history, []);
+        renderHistory();
+        showToast("History cleared", "warn");
+      }
+
+      // Stats
+      function renderStats() {
+        const history = lj(S.history, []);
+        document.getElementById("statTotal").textContent = history.length;
+        const ot = history.filter((h) => h.overtime).length;
+        document.getElementById("statOnTime").textContent = history.length - ot;
+        document.getElementById("statOT").textContent = ot;
+        const tb = history.reduce((a, h) => a + (h.breakMs || 0), 0);
+        const ab = history.length ? Math.round(tb / history.length / 60000) : 0;
+        document.getElementById("statAvgBreak").textContent = ab + "m";
+        document.getElementById("statTotalBreak").textContent =
+          Math.round(tb / 60000) + "m";
+        const freq = {};
+        history.forEach((h) => (freq[h.clockIn] = (freq[h.clockIn] || 0) + 1));
+        const best = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById("statCommonIn").textContent = best
+          ? best[0]
+          : "--";
+        drawWeekChart(history);
+      }
+      function drawWeekChart(history) {
+        const canvas = document.getElementById("weekChart");
+        const ctx = canvas.getContext("2d");
+        canvas.width = canvas.offsetWidth * devicePixelRatio;
+        canvas.height = 120 * devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+        const w = canvas.offsetWidth,
+          h = 120;
+        ctx.clearRect(0, 0, w, h);
+        const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          counts = new Array(7).fill(0),
+          now = new Date();
+        history.forEach((entry) => {
+          const d = new Date(entry.date),
+            diff = Math.floor((now - d) / 864e5);
+          if (diff < 7) {
+            const dow = (d.getDay() + 6) % 7;
+            counts[dow]++;
+          }
+        });
+        const max = Math.max(...counts, 1),
+          barW = w / 7 - 8;
+        const accent = getComputedStyle(document.documentElement)
+          .getPropertyValue("--accent")
+          .trim();
+        const text3 = getComputedStyle(document.documentElement)
+          .getPropertyValue("--text3")
+          .trim();
+        days.forEach((day, i) => {
+          const x = i * (w / 7) + 4,
+            barH = (counts[i] / max) * (h - 30),
+            y = h - 20 - barH;
+          ctx.fillStyle = counts[i] > 0 ? accent : "rgba(128,128,200,0.1)";
+          ctx.beginPath();
+          ctx.roundRect(x, y, barW, Math.max(barH, 2), 4);
+          ctx.fill();
+          ctx.fillStyle = text3;
+          ctx.font = `${10 * devicePixelRatio}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.fillText(day, x + barW / 2, h - 4);
+        });
+      }
+
+      // Toast
+      function showToast(msg, type = "success") {
+        const c = document.getElementById("toast-container");
+        const icons = { success: "✅", warn: "⚠️", danger: "🚨" };
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
+        c.appendChild(t);
+        setTimeout(() => {
+          t.style.animation = "slideOut .3s ease forwards";
+          setTimeout(() => t.remove(), 300);
+        }, 3000);
+      }
+
+      // Wallpaper
+      const WP_CATS = {
+        "Nature 🌿": [
+          "https://picsum.photos/id/15/1600/900",
+          "https://picsum.photos/id/152/1600/900",
+          "https://picsum.photos/id/163/1600/900",
+          "https://picsum.photos/id/167/1600/900",
+          "https://picsum.photos/id/176/1600/900",
+          "https://picsum.photos/id/257/1600/900",
+        ],
+        "City 🌆": [
+          "https://picsum.photos/id/1048/1600/900",
+          "https://picsum.photos/id/1040/1600/900",
+          "https://picsum.photos/id/1039/1600/900",
+          "https://picsum.photos/id/325/1600/900",
+          "https://picsum.photos/id/318/1600/900",
+          "https://picsum.photos/id/392/1600/900",
+        ],
+        "Abstract 🎨": [
+          "https://picsum.photos/id/1015/1600/900",
+          "https://picsum.photos/id/1016/1600/900",
+          "https://picsum.photos/id/24/1600/900",
+          "https://picsum.photos/id/103/1600/900",
+          "https://picsum.photos/id/104/1600/900",
+          "https://picsum.photos/id/177/1600/900",
+        ],
+        "Minimal ⬜": [
+          "https://picsum.photos/id/100/1600/900",
+          "https://picsum.photos/id/110/1600/900",
+          "https://picsum.photos/id/119/1600/900",
+          "https://picsum.photos/id/134/1600/900",
+          "https://picsum.photos/id/145/1600/900",
+          "https://picsum.photos/id/171/1600/900",
+        ],
+      };
+      let bgSettings = lj(S.bg, {
+        active: false,
+        cat: "Nature 🌿",
+        idx: 0,
+        auto: false,
+      });
+      let bgAutoInterval = null;
+
+      function initWallpaperUI() {
+        const catDiv = document.getElementById("wpCategories");
+        catDiv.innerHTML = "";
+        Object.keys(WP_CATS).forEach((cat) => {
+          const btn = document.createElement("button");
+          btn.className =
+            "wp-cat-btn" + (cat === bgSettings.cat ? " active" : "");
+          btn.textContent = cat;
+          btn.onclick = () => {
+            document
+              .querySelectorAll(".wp-cat-btn")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            bgSettings.cat = cat;
+            bgSettings.idx = 0;
+            sj(S.bg, bgSettings);
+            renderWpGrid();
+            if (bgSettings.active) applyBg();
+          };
+          catDiv.appendChild(btn);
+        });
+        renderWpGrid();
+        document.getElementById("bgToggle").checked = bgSettings.active;
+        document.getElementById("bgAutoChange").checked = bgSettings.auto;
+        if (bgSettings.active) applyBg();
+      }
+      function renderWpGrid() {
+        const grid = document.getElementById("wpGrid");
+        grid.innerHTML = "";
+        (WP_CATS[bgSettings.cat] || []).forEach((url, i) => {
+          const div = document.createElement("div");
+          div.className = "wp-thumb" + (i === bgSettings.idx ? " active" : "");
+          div.style.backgroundImage = `url('${url}')`;
+          div.onclick = () => {
+            bgSettings.idx = i;
+            sj(S.bg, bgSettings);
+            renderWpGrid();
+            if (bgSettings.active) applyBg();
+          };
+          grid.appendChild(div);
+        });
+      }
+      function applyBg() {
+        const imgs = WP_CATS[bgSettings.cat] || [];
+        if (imgs.length && bgSettings.active) {
+          document.getElementById("bgLayer").style.backgroundImage =
+            `url('${imgs[bgSettings.idx]}')`;
+          document.body.classList.add("bg-on");
+        } else {
+          document.getElementById("bgLayer").style.backgroundImage = "none";
+          document.body.classList.remove("bg-on");
+        }
+      }
+      function toggleBg() {
+        bgSettings.active = document.getElementById("bgToggle").checked;
+        sj(S.bg, bgSettings);
+        applyBg();
+      }
+      function saveBgSettings() {
+        bgSettings.auto = document.getElementById("bgAutoChange").checked;
+        sj(S.bg, bgSettings);
+        if (bgAutoInterval) clearInterval(bgAutoInterval);
+        if (bgSettings.auto) {
+          bgAutoInterval = setInterval(() => {
+            const imgs = WP_CATS[bgSettings.cat] || [];
+            bgSettings.idx = (bgSettings.idx + 1) % imgs.length;
+            sj(S.bg, bgSettings);
+            renderWpGrid();
+            if (bgSettings.active) applyBg();
+          }, 600000);
+        }
+      }
+
+      // Init
+      loadTheme();
+      const savedSettings = lj(S.settings, { use24Hour: false });
+      use24Hour = savedSettings.use24Hour || false;
+      document.getElementById("toggleFormat").checked = use24Hour;
+      document.getElementById("toggleFormat2").checked = use24Hour;
+      initSelectors();
+      startClock();
+      renderHistory();
+      renderNotifLog();
+      initWallpaperUI();
+      if (bgSettings.auto) saveBgSettings();
+      initSwatches();
+    </script>
+  </body>
+</html>
