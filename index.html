@@ -1,1884 +1,818 @@
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ETimeTracker Pro</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --bg: #0d0f1a;
-        --surface: rgba(22, 26, 46, 0.92);
-        --surface2: rgba(30, 36, 60, 0.85);
-        --border: rgba(255, 255, 255, 0.08);
-        --accent: #7c6af7;
-        --accent2: #f76a8a;
-        --accent3: #6af7c0;
-        --text: #e8eaf6;
-        --text2: #8892b0;
-        --text3: #4a5580;
-        --danger: #f76a8a;
-        --success: #6af7c0;
-        --warn: #f7c46a;
-        --card-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-        --radius: 16px;
-        --radius-sm: 8px;
-        --font-display: "Syne", sans-serif;
-        --font-mono: "Space Mono", monospace;
-      }
-      [data-theme="light"] {
-        --bg: #f0f2ff;
-        --surface: rgba(255, 255, 255, 0.92);
-        --surface2: rgba(240, 242, 255, 0.9);
-        --border: rgba(0, 0, 0, 0.08);
-        --accent: #5d4ef5;
-        --accent2: #e84469;
-        --accent3: #1abf8a;
-        --text: #1a1d36;
-        --text2: #4a5080;
-        --text3: #9098c0;
-        --card-shadow: 0 8px 40px rgba(100, 100, 200, 0.15);
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>ETimeTracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--surface:#13161e;--card:#181c27;--card2:#1e2333;--border:#2a2f42;
+  --accent:#4f8eff;--accent2:#7c5cff;--green:#34d399;--red:#f87171;--amber:#fbbf24;
+  --text:#e8ecf4;--muted:#6b7594;--muted2:#3a4060;--radius:14px;--radius-sm:8px;
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse 600px 400px at 20% 20%,rgba(79,142,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 500px 500px at 80% 70%,rgba(124,92,255,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.layout{position:relative;z-index:1;display:flex;gap:18px;max-width:1200px;margin:0 auto;align-items:flex-start;flex-wrap:wrap;}
 
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+/* TRACKER */
+.tracker{flex:0 0 420px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.tracker-header{background:linear-gradient(135deg,#1a2040 0%,#111827 100%);padding:22px 24px 18px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.tracker-header::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(79,142,255,0.15),transparent 70%);border-radius:50%;}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo h1{font-size:22px;font-weight:600;letter-spacing:-0.5px;}
+.logo h1 span{color:var(--accent);}
+.header-right{position:absolute;top:18px;right:18px;z-index:2;display:flex;gap:8px;flex-direction: column;}
+.btn-reset{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;}
+.btn-reset:hover{background:rgba(248,113,113,.25);}
+.session-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--green);}
+.session-badge.inactive{background:rgba(107,117,148,.1);border-color:rgba(107,117,148,.2);color:var(--muted);}
+.tagline{font-size:12px;color:var(--muted);letter-spacing:0.5px;}
+.live-clock{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--text);margin-top:10px;letter-spacing:2px;}
+.live-date{font-size:12px;color:var(--muted);margin-top:3px;}
+.tracker-body{padding:20px 24px;}
+.field-group{margin-bottom:18px;}
+.field-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.field-label svg{opacity:.7;}
+.time-row{display:flex;gap:6px;align-items:center;}
+.custom-select{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:9px 10px;font-size:15px;font-family:'DM Mono',monospace;font-weight:500;cursor:pointer;transition:all .2s;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7594' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;}
+.custom-select:focus,.custom-select:hover{border-color:var(--accent);background-color:#1e2540;}
+.custom-select.active{border-color:var(--accent);color:var(--accent);background-color:#1a2540;}
+.sep{color:var(--muted);font-size:18px;font-weight:300;padding:0 2px;}
+.ampm-toggle{display:flex;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.ampm-btn{padding:9px 12px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted);border:none;background:transparent;}
+.ampm-btn.selected{background:var(--accent);color:#fff;}
+.format-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:18px;justify-content:flex-end;}
+.toggle-switch{position:relative;width:38px;height:22px;cursor:pointer;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.slider-toggle{position:absolute;inset:0;background:var(--muted2);border-radius:22px;transition:.3s;}
+.slider-toggle::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.3s;}
+.toggle-switch input:checked+.slider-toggle{background:var(--accent);}
+.toggle-switch input:checked+.slider-toggle::before{transform:translateX(16px);}
+.break-item{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;position:relative;}
+.break-item-header{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;}
+.break-remove{position:absolute;top:10px;right:10px;background:rgba(248,113,113,.15);border:none;color:var(--red);width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.break-remove:hover{background:rgba(248,113,113,.3);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.btn{padding:10px 18px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;letter-spacing:.3px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);}
+.btn-danger:hover{background:rgba(248,113,113,.25);}
+.results{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:16px;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.result-item{background:var(--card);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border);}
+.result-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:6px;}
+.result-value{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);}
+.result-value.accent{color:var(--accent);}.result-value.green{color:var(--green);}.result-value.amber{color:var(--amber);}.result-value.red{color:var(--red);}
+.timer-display{text-align:center;padding:18px;background:linear-gradient(135deg,rgba(79,142,255,.08),rgba(124,92,255,.08));border:1px solid rgba(79,142,255,.2);border-radius:var(--radius-sm);margin-bottom:16px;}
+.timer-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;}
+.timer-value{font-family:'DM Mono',monospace;font-size:36px;font-weight:500;color:var(--accent);letter-spacing:3px;}
+.timer-value.done{color:var(--green);font-size:20px;}.timer-value.overtime{color:var(--red);}
+.progress-bar{height:4px;background:var(--muted2);border-radius:2px;margin-top:12px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s ease;}
+.progress-fill.done{background:var(--green);}.progress-fill.overtime{background:var(--red);}
+.author{font-size:11px;color:var(--muted);text-align:right;padding-top:12px;border-top:1px solid var(--border);margin-top:4px;}
+.author span{color:var(--accent2);}
 
-      body {
-        font-family: var(--font-display);
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        transition:
-          background 0.5s ease,
-          color 0.3s;
-        overflow-x: hidden;
-      }
+/* SIDE */
+.side{flex:1;min-width:280px;display:flex;flex-direction:column;gap:16px;}
+.widget-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.widget-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.02);}
+.widget-title{font-size:13px;font-weight:600;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+.widget-title-icon{font-size:16px;}
+.widget-toggle{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.5px;transition:all .2s;}
+.widget-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.widget-body{padding:16px;}.widget-body.hidden{display:none;}
+.notes-area{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px;resize:vertical;min-height:90px;outline:none;transition:border-color .2s;}
+.notes-area:focus{border-color:var(--accent);}
+.notes-area::placeholder{color:var(--muted);}
+#ytInput{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+#ytInput:focus{border-color:var(--accent);}
+#ytInput::placeholder{color:var(--muted);}
+#ytFrame{width:100%;border-radius:var(--radius-sm);border:1px solid var(--border);aspect-ratio:16/9;background:#000;}
+#gameCanvas{display:block;margin:0 auto;border-radius:var(--radius-sm);border:1px solid var(--border);background:#0a0c12;}
+.game-controls{display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap;}
+.game-score{text-align:center;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:14px;color:var(--muted);}
+.game-score span{color:var(--accent);font-weight:500;}
+.mobile-dpad{display:none;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;margin-top:10px;justify-items:center;}
+.dpad-btn{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;width:44px;height:44px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.dpad-btn:active{background:var(--accent);color:#fff;}
+#toastContainer{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
+.toast{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;min-width:280px;max-width:340px;box-shadow:0 12px 40px rgba(0,0,0,.6);display:flex;align-items:flex-start;gap:12px;animation:toastIn .3s ease;pointer-events:all;}
+.toast.removing{animation:toastOut .3s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
+.toast-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.toast-success .toast-icon{background:rgba(52,211,153,.15);color:var(--green);}
+.toast-info .toast-icon{background:rgba(79,142,255,.15);color:var(--accent);}
+.toast-warn .toast-icon{background:rgba(251,191,36,.15);color:var(--amber);}
+.toast-error .toast-icon{background:rgba(248,113,113,.15);color:var(--red);}
+.toast-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.toast-msg{font-size:13px;color:var(--muted);line-height:1.5;}
+.toast-close{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 0 0 8px;flex-shrink:0;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--surface);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:780px){.layout{flex-direction:column;}.tracker{flex:1 1 100%;}.mobile-dpad{display:grid;}}
+</style>
+</head>
+<body>
+<div id="toastContainer"></div>
+<div class="layout">
 
-      /* ─── Background Layer ─── */
-      #bgLayer {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        background-size: cover;
-        background-position: center;
-        transition: background-image 1s ease;
-      }
-      #bgLayer::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: var(--bg);
-        opacity: 0.72;
-        transition: opacity 0.5s;
-      }
-      body.bg-on #bgLayer::after {
-        opacity: 0.5;
-      }
+  <!-- MAIN TRACKER -->
+  <div class="tracker">
+    <div class="tracker-header">
+      <div class="header-right">
+        <span class="session-badge inactive" id="sessionBadge">● No Session</span>
+        <button class="btn-reset" id="resetBtn" onclick="resetSession()" style="display:none" title="Reset today's session">↺ Reset Day</button>
+      </div>
+      <div class="logo">
+        <div class="logo-icon">🕐</div>
+        <h1>E<span>Time</span>Tracker</h1>
+      </div>
+      <div class="tagline">YOUR WORKDAY, PERFECTLY TIMED</div>
+      <div class="live-clock" id="liveClock">--:--:--</div>
+      <div class="live-date" id="liveDate"></div>
+    </div>
 
-      /* ─── Layout ─── */
-      #app {
-        position: relative;
-        z-index: 1;
-        display: grid;
-        grid-template-columns: 340px 1fr;
-        gap: 20px;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 24px 16px;
-        min-height: 100vh;
-        align-items: start;
-      }
-      @media (max-width: 780px) {
-        #app {
-          grid-template-columns: 1fr;
-        }
-      }
+    <div class="tracker-body">
+      <div class="format-toggle">
+        <span>24h</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleFormat"/>
+          <span class="slider-toggle"></span>
+        </label>
+        <span style="color:var(--text)">12h</span>
+      </div>
 
-      /* ─── Card ─── */
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--card-shadow);
-        backdrop-filter: blur(20px);
-        padding: 24px;
-        transition:
-          background 0.3s,
-          border 0.3s;
-      }
-      .card + .card {
-        margin-top: 16px;
-      }
-
-      /* ─── Header ─── */
-      .app-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-      }
-      .app-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        background: linear-gradient(135deg, var(--accent), var(--accent2));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      .header-actions {
-        display: flex;
-        gap: 8px;
-      }
-      .icon-btn {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: all 0.2s;
-        color: var(--text2);
-      }
-      .icon-btn:hover {
-        background: var(--accent);
-        color: white;
-        border-color: var(--accent);
-        transform: scale(1.05);
-      }
-
-      /* ─── Section Labels ─── */
-      .field-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--text3);
-        margin-bottom: 8px;
-      }
-      .field-group {
-        margin-bottom: 18px;
-      }
-
-      /* ─── Select Dropdowns ─── */
-      .time-row {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-      }
-      select {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        color: var(--text);
-        font-family: var(--font-mono);
-        font-size: 0.9rem;
-        padding: 8px 10px;
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        transition: all 0.2s;
-        outline: none;
-        appearance: none;
-        text-align: center;
-      }
-      select:focus,
-      select.active {
-        border-color: var(--accent);
-        background: var(--surface);
-        box-shadow: 0 0 0 3px rgba(124, 106, 247, 0.2);
-      }
-      select option {
-        background: #1a1d36;
-      }
-
-      .sep {
-        color: var(--text3);
-        font-family: var(--font-mono);
-        font-size: 1.2rem;
-        font-weight: 700;
-      }
-
-      /* ─── Buttons ─── */
-      .btn {
-        font-family: var(--font-display);
-        font-size: 0.85rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        padding: 10px 18px;
-        border: none;
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .btn-primary {
-        background: var(--accent);
-        color: white;
-      }
-      .btn-primary:hover {
-        background: #6a59e0;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 20px rgba(124, 106, 247, 0.4);
-      }
-      .btn-danger {
-        background: rgba(247, 106, 138, 0.15);
-        color: var(--danger);
-        border: 1px solid rgba(247, 106, 138, 0.3);
-      }
-      .btn-danger:hover {
-        background: var(--danger);
-        color: white;
-      }
-      .btn-ghost {
-        background: var(--surface2);
-        color: var(--text2);
-        border: 1px solid var(--border);
-      }
-      .btn-ghost:hover {
-        background: var(--accent);
-        color: white;
-        border-color: var(--accent);
-      }
-      .btn-success {
-        background: rgba(106, 247, 192, 0.15);
-        color: var(--success);
-        border: 1px solid rgba(106, 247, 192, 0.3);
-      }
-      .btn-success:hover {
-        background: var(--success);
-        color: #0d1a12;
-      }
-      .btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 8px;
-      }
-
-      /* ─── Big Timer Display ─── */
-      .timer-display {
-        text-align: center;
-        padding: 20px 0 12px;
-      }
-      .timer-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--text3);
-        margin-bottom: 6px;
-      }
-      .timer-value {
-        font-family: var(--font-mono);
-        font-size: 3rem;
-        font-weight: 700;
-        color: var(--accent);
-        letter-spacing: 2px;
-        transition: color 0.5s;
-        text-shadow: 0 0 30px rgba(124, 106, 247, 0.4);
-      }
-      .timer-value.urgent {
-        color: var(--warn);
-        text-shadow: 0 0 30px rgba(247, 196, 106, 0.5);
-      }
-      .timer-value.overtime {
-        color: var(--danger);
-        text-shadow: 0 0 30px rgba(247, 106, 138, 0.5);
-      }
-      .timer-value.done {
-        color: var(--success);
-      }
-
-      /* ─── Progress Ring ─── */
-      .progress-ring-wrap {
-        display: flex;
-        justify-content: center;
-        margin: 4px 0 16px;
-      }
-      .progress-ring {
-        transform: rotate(-90deg);
-      }
-      .ring-bg {
-        fill: none;
-        stroke: var(--border);
-        stroke-width: 6;
-      }
-      .ring-fg {
-        fill: none;
-        stroke: var(--accent);
-        stroke-width: 6;
-        stroke-linecap: round;
-        transition:
-          stroke-dashoffset 1s linear,
-          stroke 0.5s;
-      }
-
-      /* ─── Stats Row ─── */
-      .stats-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 12px;
-      }
-      .stat-card {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 12px;
-        text-align: center;
-      }
-      .stat-card .stat-label {
-        font-size: 0.65rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--text3);
-        margin-bottom: 4px;
-      }
-      .stat-card .stat-value {
-        font-family: var(--font-mono);
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--text);
-      }
-      .stat-card .stat-value.green {
-        color: var(--success);
-      }
-      .stat-card .stat-value.pink {
-        color: var(--accent2);
-      }
-
-      /* ─── Break Item ─── */
-      .break-item {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 14px;
-        margin-bottom: 10px;
-        position: relative;
-      }
-      .break-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-      }
-      .break-tag {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--accent);
-      }
-      .break-remove {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--danger);
-        font-size: 1rem;
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-      .break-remove:hover {
-        background: rgba(247, 106, 138, 0.15);
-      }
-
-      /* ─── Tabs (Right Panel) ─── */
-      .tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 16px;
-      }
-      .tab-btn {
-        font-family: var(--font-display);
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        padding: 8px 14px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        background: var(--surface2);
-        color: var(--text2);
-        transition: all 0.2s;
-      }
-      .tab-btn.active {
-        background: var(--accent);
-        color: white;
-        border-color: var(--accent);
-      }
-      .tab-panel {
-        display: none;
-      }
-      .tab-panel.active {
-        display: block;
-      }
-
-      /* ─── History ─── */
-      .history-item {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: all 0.2s;
-      }
-      .history-item:hover {
-        border-color: var(--accent);
-      }
-      .history-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-      .history-dot.on-time {
-        background: var(--success);
-      }
-      .history-dot.overtime {
-        background: var(--danger);
-      }
-      .history-details {
-        flex: 1;
-      }
-      .history-date {
-        font-size: 0.72rem;
-        color: var(--text3);
-        font-family: var(--font-mono);
-      }
-      .history-times {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text);
-        margin-top: 2px;
-      }
-      .history-badge {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        padding: 3px 8px;
-        border-radius: 20px;
-      }
-      .badge-on-time {
-        background: rgba(106, 247, 192, 0.15);
-        color: var(--success);
-      }
-      .badge-overtime {
-        background: rgba(247, 106, 138, 0.15);
-        color: var(--danger);
-      }
-      .history-empty {
-        text-align: center;
-        color: var(--text3);
-        padding: 40px 20px;
-        font-size: 0.9rem;
-      }
-
-      /* ─── Wallpaper Settings ─── */
-      .wp-categories {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 16px;
-      }
-      .wp-cat-btn {
-        font-family: var(--font-display);
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 6px 14px;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        cursor: pointer;
-        background: var(--surface2);
-        color: var(--text2);
-        transition: all 0.2s;
-      }
-      .wp-cat-btn.active {
-        background: var(--accent);
-        color: white;
-        border-color: var(--accent);
-      }
-      .wp-preview-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-      .wp-thumb {
-        aspect-ratio: 16/9;
-        border-radius: 6px;
-        cursor: pointer;
-        border: 2px solid transparent;
-        background-size: cover;
-        background-position: center;
-        transition: all 0.2s;
-      }
-      .wp-thumb:hover,
-      .wp-thumb.active {
-        border-color: var(--accent);
-        transform: scale(1.03);
-      }
-      .wp-controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      .wp-toggle-label {
-        font-size: 0.8rem;
-        color: var(--text2);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      /* ─── Toggle Switch ─── */
-      .toggle {
-        position: relative;
-        width: 44px;
-        height: 24px;
-      }
-      .toggle input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .toggle-track {
-        position: absolute;
-        inset: 0;
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-      .toggle-track::after {
-        content: "";
-        position: absolute;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: var(--text3);
-        left: 2px;
-        top: 2px;
-        transition: 0.3s;
-      }
-      .toggle input:checked + .toggle-track {
-        background: var(--accent);
-        border-color: var(--accent);
-      }
-      .toggle input:checked + .toggle-track::after {
-        transform: translateX(20px);
-        background: white;
-      }
-
-      /* ─── Notifications Log ─── */
-      .notif-list {
-      }
-      .notif-item {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--border);
-      }
-      .notif-icon {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-        margin-top: 1px;
-      }
-      .notif-text {
-        font-size: 0.85rem;
-        color: var(--text2);
-        flex: 1;
-      }
-      .notif-time {
-        font-size: 0.7rem;
-        color: var(--text3);
-        font-family: var(--font-mono);
-        white-space: nowrap;
-      }
-
-      /* ─── Toast ─── */
-      #toast-container {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .toast {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 12px 18px;
-        box-shadow: var(--card-shadow);
-        font-size: 0.85rem;
-        backdrop-filter: blur(20px);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        animation: slideIn 0.3s ease;
-        min-width: 240px;
-      }
-      .toast.success {
-        border-left: 3px solid var(--success);
-      }
-      .toast.warn {
-        border-left: 3px solid var(--warn);
-      }
-      .toast.danger {
-        border-left: 3px solid var(--danger);
-      }
-      @keyframes slideIn {
-        from {
-          transform: translateX(60px);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideOut {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(60px);
-          opacity: 0;
-        }
-      }
-
-      /* ─── Scrollbar ─── */
-      ::-webkit-scrollbar {
-        width: 5px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 10px;
-      }
-
-      /* ─── Footer ─── */
-      .footer {
-        text-align: right;
-        font-size: 0.65rem;
-        color: var(--text3);
-        margin-top: 12px;
-      }
-      .footer span {
-        color: var(--accent);
-      }
-
-      /* ─── Keyframes ─── */
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.6;
-        }
-      }
-      .pulsing {
-        animation: pulse 1.2s ease infinite;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="bgLayer"></div>
-
-    <div id="app">
-      <!-- LEFT PANEL -->
-      <div class="left-panel">
-        <div class="card">
-          <div class="app-header">
-            <div class="app-title">⏱ ETimeTracker</div>
-            <div class="header-actions">
-              <div
-                class="icon-btn"
-                id="themeBtn"
-                title="Toggle Theme"
-                onclick="toggleTheme()"
-              >
-                🌙
-              </div>
-              <div
-                class="icon-btn"
-                id="notifBtn"
-                title="Enable Notifications"
-                onclick="requestNotifPerm()"
-              >
-                🔔
-              </div>
-            </div>
-          </div>
-
-          <!-- Format toggle -->
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              justify-content: flex-end;
-              gap: 8px;
-              margin-bottom: 16px;
-            "
-          >
-            <span style="font-size: 0.75rem; color: var(--text3)">24h</span>
-            <label class="toggle">
-              <input
-                type="checkbox"
-                id="toggleFormat"
-                onchange="onFormatChange()"
-              />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-
-          <!-- Clock In -->
-          <div class="field-group">
-            <div class="field-label">🏢 Clock In</div>
-            <div class="time-row" id="clockInSelectors"></div>
-          </div>
-
-          <!-- Working Hours -->
-          <div class="field-group">
-            <div class="field-label">⏳ Working Hours</div>
-            <div class="time-row" id="workHoursSelectors"></div>
-          </div>
-
-          <!-- Breaks -->
-          <div class="field-group" id="breakSection">
-            <div class="field-label">☕ Breaks</div>
-            <div id="breaksContainer"></div>
-            <div class="btn-row">
-              <button class="btn btn-ghost" onclick="addBreak()">
-                + Add Break
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick Note -->
-          <div class="field-group">
-            <div class="field-label">📝 Note (optional)</div>
-            <input
-              type="text"
-              id="noteInput"
-              placeholder="e.g. Working from home..."
-              style="
-                width: 100%;
-                background: var(--surface2);
-                border: 1px solid var(--border);
-                color: var(--text);
-                font-family: var(--font-display);
-                font-size: 0.85rem;
-                padding: 8px 12px;
-                border-radius: var(--radius-sm);
-                outline: none;
-                transition: border 0.2s;
-              "
-            />
-          </div>
-
-          <!-- Calculate -->
-          <button
-            class="btn btn-primary"
-            style="width: 100%; justify-content: center; padding: 12px"
-            onclick="calculate()"
-          >
-            ▶ Calculate
-          </button>
+      <div class="field-group">
+        <div class="field-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Clock In
         </div>
+        <div class="time-row" id="clockInSelectors"></div>
+      </div>
 
-        <!-- Timer Card -->
-        <div class="card" id="timerCard">
-          <div class="timer-display">
-            <div class="timer-label" id="timerLabel">Remaining Time</div>
-            <div class="timer-value" id="remainingTime">--:--:--</div>
+      <div class="field-group">
+        <div class="field-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Working Hours
+        </div>
+        <div class="time-row" id="workHoursSelectors"></div>
+      </div>
+
+      <div id="breakTimeContainer"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="addBreak()">＋ Add Break</button>
+        <button class="btn btn-danger" id="removeBreakBtn" onclick="removeBreak()" style="display:none">✕ Remove Last</button>
+        <button class="btn btn-primary" onclick="calculate()">⚡ Calculate</button>
+      </div>
+
+      <div class="timer-display" id="timerDisplay" style="display:none">
+        <div class="timer-label">⏳ Remaining Time</div>
+        <div class="timer-value" id="remainingTime">--:--:--</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="results" id="resultsPanel" style="display:none">
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label">End Time</div>
+            <div class="result-value accent" id="endTime">-</div>
           </div>
-          <div class="progress-ring-wrap">
-            <svg
-              class="progress-ring"
-              width="110"
-              height="110"
-              viewBox="0 0 110 110"
-            >
-              <circle class="ring-bg" cx="55" cy="55" r="48" />
-              <circle
-                class="ring-fg"
-                id="progressRing"
-                cx="55"
-                cy="55"
-                r="48"
-                stroke-dasharray="301.6"
-                stroke-dashoffset="301.6"
-              />
-            </svg>
+          <div class="result-item">
+            <div class="result-label">Break Duration</div>
+            <div class="result-value" id="breakTimeDisplay">None</div>
           </div>
-          <div class="stats-row">
-            <div class="stat-card">
-              <div class="stat-label">End Time</div>
-              <div class="stat-value" id="endTime">--:--</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Break Total</div>
-              <div class="stat-value green" id="breakTime">0m</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Elapsed</div>
-              <div class="stat-value" id="elapsedTime">--:--</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Overtime</div>
-              <div class="stat-value pink" id="overTime">--</div>
-            </div>
+          <div class="result-item" id="overtimeItem" style="display:none">
+            <div class="result-label">Overtime</div>
+            <div class="result-value red" id="overTime">-</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Status</div>
+            <div class="result-value green" id="statusDisplay">Active</div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT PANEL -->
-      <div class="right-panel">
-        <div class="card">
-          <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('history', this)">
-              📋 History
-            </button>
-            <button class="tab-btn" onclick="switchTab('wallpaper', this)">
-              🖼 Wallpaper
-            </button>
-            <button class="tab-btn" onclick="switchTab('notifications', this)">
-              🔔 Alerts
-            </button>
-            <button class="tab-btn" onclick="switchTab('stats', this)">
-              📊 Stats
-            </button>
-          </div>
+      <div class="author">Developed by <span>A$hique</span></div>
+    </div>
+  </div>
 
-          <!-- HISTORY TAB -->
-          <div class="tab-panel active" id="tab-history">
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 12px;
-              "
-            >
-              <div class="field-label" style="margin: 0">Session History</div>
-              <button
-                class="btn btn-danger"
-                style="padding: 6px 12px; font-size: 0.75rem"
-                onclick="clearHistory()"
-              >
-                Clear All
-              </button>
-            </div>
-            <div id="historyList">
-              <div class="history-empty">
-                🕐 No sessions recorded yet.<br />Hit Calculate to start
-                tracking!
-              </div>
-            </div>
-          </div>
-
-          <!-- WALLPAPER TAB -->
-          <div class="tab-panel" id="tab-wallpaper">
-            <div class="field-label">Background Category</div>
-            <div class="wp-categories" id="wpCategories"></div>
-            <div class="wp-preview-grid" id="wpGrid"></div>
-            <div class="wp-controls">
-              <label class="wp-toggle-label">
-                <label class="toggle">
-                  <input type="checkbox" id="bgToggle" onchange="toggleBg()" />
-                  <span class="toggle-track"></span>
-                </label>
-                Show Background
-              </label>
-              <label class="wp-toggle-label">
-                <label class="toggle">
-                  <input
-                    type="checkbox"
-                    id="bgAutoChange"
-                    onchange="saveBgSettings()"
-                  />
-                  <span class="toggle-track"></span>
-                </label>
-                Auto-change (10 min)
-              </label>
-            </div>
-          </div>
-
-          <!-- NOTIFICATIONS TAB -->
-          <div class="tab-panel" id="tab-notifications">
-            <div class="field-label" style="margin-bottom: 12px">
-              Alert Settings
-            </div>
-            <div
-              style="
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                margin-bottom: 20px;
-              "
-            >
-              <label
-                class="wp-toggle-label"
-                style="justify-content: space-between"
-              >
-                <span>⏰ Notify when time is up</span>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    id="notifOnEnd"
-                    checked
-                    onchange="saveNotifSettings()" /><span
-                    class="toggle-track"
-                  ></span
-                ></label>
-              </label>
-              <label
-                class="wp-toggle-label"
-                style="justify-content: space-between"
-              >
-                <span>⚠️ 15-min warning</span>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    id="notif15"
-                    checked
-                    onchange="saveNotifSettings()" /><span
-                    class="toggle-track"
-                  ></span
-                ></label>
-              </label>
-              <label
-                class="wp-toggle-label"
-                style="justify-content: space-between"
-              >
-                <span>⚠️ 30-min warning</span>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    id="notif30"
-                    onchange="saveNotifSettings()" /><span
-                    class="toggle-track"
-                  ></span
-                ></label>
-              </label>
-              <label
-                class="wp-toggle-label"
-                style="justify-content: space-between"
-              >
-                <span>📢 Hourly check-in</span>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    id="notifHourly"
-                    onchange="saveNotifSettings()" /><span
-                    class="toggle-track"
-                  ></span
-                ></label>
-              </label>
-              <label
-                class="wp-toggle-label"
-                style="justify-content: space-between"
-              >
-                <span>🔊 Sound Alerts</span>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    id="soundAlert"
-                    checked
-                    onchange="saveNotifSettings()" /><span
-                    class="toggle-track"
-                  ></span
-                ></label>
-              </label>
-            </div>
-            <div class="field-label" style="margin-bottom: 8px">
-              Notification Log
-            </div>
-            <div class="notif-list" id="notifLog">
-              <div class="history-empty" style="padding: 20px 0">
-                No alerts yet.
-              </div>
-            </div>
-          </div>
-
-          <!-- STATS TAB -->
-          <div class="tab-panel" id="tab-stats">
-            <div class="field-label" style="margin-bottom: 14px">
-              Work Summary
-            </div>
-            <div class="stats-row" style="margin-bottom: 16px">
-              <div class="stat-card">
-                <div class="stat-label">Total Sessions</div>
-                <div class="stat-value" id="statTotal">0</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">On-Time Days</div>
-                <div class="stat-value green" id="statOnTime">0</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Overtime Days</div>
-                <div class="stat-value pink" id="statOT">0</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Avg Break</div>
-                <div class="stat-value" id="statAvgBreak">0m</div>
-              </div>
-            </div>
-            <div class="stat-card" style="margin-bottom: 10px">
-              <div class="stat-label">Most Common Clock-In</div>
-              <div class="stat-value" id="statCommonIn">--</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Total Break Time (all sessions)</div>
-              <div class="stat-value green" id="statTotalBreak">0m</div>
-            </div>
-            <div style="margin-top: 16px">
-              <div class="field-label" style="margin-bottom: 10px">
-                Weekly Overview
-              </div>
-              <canvas id="weekChart" height="120" style="width: 100%"></canvas>
-            </div>
-          </div>
+  <!-- SIDE PANELS -->
+  <div class="side">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div class="widget-title"><span class="widget-title-icon">📝</span> Quick Notes</div>
+        <button class="widget-toggle" onclick="toggleWidget('notes')">Hide</button>
+      </div>
+      <div class="widget-body" id="notes">
+        <textarea class="notes-area" id="notesArea" placeholder="Jot down tasks, reminders, or anything on your mind..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="saveNotes()">💾 Save</button>
+          <button class="btn btn-danger" style="font-size:12px;padding:7px 12px;" onclick="clearNotes()">Clear</button>
         </div>
       </div>
     </div>
 
-    <div id="toast-container"></div>
-
-    <script>
-      // ═══════════════════════════════════════════
-      // STATE & CONFIG
-      // ═══════════════════════════════════════════
-      let use24Hour = false;
-      let breakCount = 0;
-      let timerInterval = null;
-      let requiredEndTime = null;
-      let clockInTime = null;
-      let totalWorkMs = 0;
-      let alertShownEnd = false,
-        alertShown15 = false,
-        alertShown30 = false;
-      let lastHourAlert = -1;
-
-      const STORAGE = {
-        history: "ett_history",
-        settings: "ett_settings",
-        bgSettings: "ett_bg",
-        notifLog: "ett_notiflog",
-      };
-
-      function loadJSON(key, fallback) {
-        try {
-          return JSON.parse(localStorage.getItem(key)) || fallback;
-        } catch {
-          return fallback;
-        }
-      }
-      function saveJSON(key, val) {
-        localStorage.setItem(key, JSON.stringify(val));
-      }
-
-      // ═══════════════════════════════════════════
-      // WALLPAPER SYSTEM
-      // ═══════════════════════════════════════════
-      const WP_CATS = {
-        "Nature 🌿": [
-          "https://picsum.photos/id/15/1600/900",
-          "https://picsum.photos/id/152/1600/900",
-          "https://picsum.photos/id/163/1600/900",
-          "https://picsum.photos/id/167/1600/900",
-          "https://picsum.photos/id/176/1600/900",
-          "https://picsum.photos/id/257/1600/900",
-        ],
-        "City 🌆": [
-          "https://picsum.photos/id/1048/1600/900",
-          "https://picsum.photos/id/1040/1600/900",
-          "https://picsum.photos/id/1039/1600/900",
-          "https://picsum.photos/id/325/1600/900",
-          "https://picsum.photos/id/318/1600/900",
-          "https://picsum.photos/id/392/1600/900",
-        ],
-        "Abstract 🎨": [
-          "https://picsum.photos/id/1015/1600/900",
-          "https://picsum.photos/id/1016/1600/900",
-          "https://picsum.photos/id/24/1600/900",
-          "https://picsum.photos/id/103/1600/900",
-          "https://picsum.photos/id/104/1600/900",
-          "https://picsum.photos/id/177/1600/900",
-        ],
-        "Minimal ⬜": [
-          "https://picsum.photos/id/100/1600/900",
-          "https://picsum.photos/id/110/1600/900",
-          "https://picsum.photos/id/119/1600/900",
-          "https://picsum.photos/id/134/1600/900",
-          "https://picsum.photos/id/145/1600/900",
-          "https://picsum.photos/id/171/1600/900",
-        ],
-        "Space 🚀": [
-          "https://picsum.photos/id/1032/1600/900",
-          "https://picsum.photos/id/1033/1600/900",
-          "https://picsum.photos/id/1024/1600/900",
-          "https://picsum.photos/id/1068/1600/900",
-          "https://picsum.photos/id/1045/1600/900",
-          "https://picsum.photos/id/1080/1600/900",
-        ],
-      };
-
-      let bgSettings = loadJSON(STORAGE.bgSettings, {
-        active: true,
-        cat: "Nature 🌿",
-        idx: 0,
-        auto: false,
-      });
-      let bgAutoInterval = null;
-
-      function initWallpaperUI() {
-        const catDiv = document.getElementById("wpCategories");
-        catDiv.innerHTML = "";
-        Object.keys(WP_CATS).forEach((cat) => {
-          const btn = document.createElement("button");
-          btn.className =
-            "wp-cat-btn" + (cat === bgSettings.cat ? " active" : "");
-          btn.textContent = cat;
-          btn.onclick = () => selectWpCat(cat, btn);
-          catDiv.appendChild(btn);
-        });
-        renderWpGrid();
-        document.getElementById("bgToggle").checked = bgSettings.active;
-        document.getElementById("bgAutoChange").checked = bgSettings.auto;
-        if (bgSettings.active) applyBg();
-      }
-
-      function selectWpCat(cat, btn) {
-        document
-          .querySelectorAll(".wp-cat-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        bgSettings.cat = cat;
-        bgSettings.idx = 0;
-        saveJSON(STORAGE.bgSettings, bgSettings);
-        renderWpGrid();
-        if (bgSettings.active) applyBg();
-      }
-
-      function renderWpGrid() {
-        const grid = document.getElementById("wpGrid");
-        grid.innerHTML = "";
-        const imgs = WP_CATS[bgSettings.cat] || [];
-        imgs.forEach((url, i) => {
-          const div = document.createElement("div");
-          div.className = "wp-thumb" + (i === bgSettings.idx ? " active" : "");
-          div.style.backgroundImage = `url('${url}')`;
-          div.onclick = () => {
-            bgSettings.idx = i;
-            saveJSON(STORAGE.bgSettings, bgSettings);
-            renderWpGrid();
-            if (bgSettings.active) applyBg();
-          };
-          grid.appendChild(div);
-        });
-      }
-
-      function applyBg() {
-        const imgs = WP_CATS[bgSettings.cat] || [];
-        if (imgs.length && bgSettings.active) {
-          document.getElementById("bgLayer").style.backgroundImage =
-            `url('${imgs[bgSettings.idx]}')`;
-          document.body.classList.add("bg-on");
-        } else {
-          document.getElementById("bgLayer").style.backgroundImage = "none";
-          document.body.classList.remove("bg-on");
-        }
-      }
-
-      function toggleBg() {
-        bgSettings.active = document.getElementById("bgToggle").checked;
-        saveJSON(STORAGE.bgSettings, bgSettings);
-        applyBg();
-      }
-
-      function saveBgSettings() {
-        bgSettings.auto = document.getElementById("bgAutoChange").checked;
-        saveJSON(STORAGE.bgSettings, bgSettings);
-        if (bgAutoInterval) clearInterval(bgAutoInterval);
-        if (bgSettings.auto) {
-          bgAutoInterval = setInterval(
-            () => {
-              const imgs = WP_CATS[bgSettings.cat] || [];
-              bgSettings.idx = (bgSettings.idx + 1) % imgs.length;
-              saveJSON(STORAGE.bgSettings, bgSettings);
-              renderWpGrid();
-              if (bgSettings.active) applyBg();
-            },
-            10 * 60 * 1000,
-          );
-        }
-      }
-
-      // ═══════════════════════════════════════════
-      // THEME
-      // ═══════════════════════════════════════════
-      let isDark = true;
-      function toggleTheme() {
-        isDark = !isDark;
-        document.documentElement.setAttribute(
-          "data-theme",
-          isDark ? "dark" : "light",
-        );
-        document.getElementById("themeBtn").textContent = isDark ? "🌙" : "☀️";
-        saveJSON("ett_theme", isDark);
-      }
-      function loadTheme() {
-        isDark = loadJSON("ett_theme", true);
-        document.documentElement.setAttribute(
-          "data-theme",
-          isDark ? "dark" : "light",
-        );
-        document.getElementById("themeBtn").textContent = isDark ? "🌙" : "☀️";
-      }
-
-      // ═══════════════════════════════════════════
-      // TABS
-      // ═══════════════════════════════════════════
-      function switchTab(name, btn) {
-        document
-          .querySelectorAll(".tab-panel")
-          .forEach((p) => p.classList.remove("active"));
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach((b) => b.classList.remove("active"));
-        document.getElementById("tab-" + name).classList.add("active");
-        btn.classList.add("active");
-        if (name === "stats") renderStats();
-      }
-
-      // ═══════════════════════════════════════════
-      // SELECTORS
-      // ═══════════════════════════════════════════
-      function createSelect(id, options, defaultValue) {
-        const sel = document.createElement("select");
-        sel.id = id;
-        options.forEach((opt) => {
-          const o = document.createElement("option");
-          o.value = opt.value;
-          o.textContent = opt.label;
-          if (opt.value == defaultValue) o.selected = true;
-          sel.appendChild(o);
-        });
-        sel.addEventListener("change", () => sel.classList.add("active"));
-        return sel;
-      }
-
-      function getHourOptions() {
-        if (use24Hour)
-          return Array.from({ length: 24 }, (_, i) => ({
-            value: i,
-            label: i.toString().padStart(2, "0"),
-          }));
-        return Array.from({ length: 12 }, (_, i) => ({
-          value: i + 1,
-          label: (i + 1).toString().padStart(2, "0"),
-        }));
-      }
-      function getMinuteOptions() {
-        return Array.from({ length: 60 }, (_, i) => ({
-          value: i,
-          label: i.toString().padStart(2, "0"),
-        }));
-      }
-      const ampmOpts = [
-        { value: "AM", label: "AM" },
-        { value: "PM", label: "PM" },
-      ];
-
-      function makeSep(char = ":") {
-        const s = document.createElement("span");
-        s.className = "sep";
-        s.textContent = char;
-        return s;
-      }
-
-      function createTimeSelectors(prefix, dh = 8, dm = 30, dampm = "AM") {
-        const wrap = document.createElement("span");
-        wrap.className = "time-row";
-        const h = createSelect(prefix + "_hour", getHourOptions(), dh);
-        const m = createSelect(prefix + "_minute", getMinuteOptions(), dm);
-        wrap.appendChild(h);
-        wrap.appendChild(makeSep());
-        wrap.appendChild(m);
-        if (!use24Hour) {
-          const a = createSelect(prefix + "_ampm", ampmOpts, dampm);
-          a.style.minWidth = "60px";
-          wrap.appendChild(a);
-        }
-        return wrap;
-      }
-
-      function readTime(prefix) {
-        const h = document.getElementById(prefix + "_hour");
-        const m = document.getElementById(prefix + "_minute");
-        const a = document.getElementById(prefix + "_ampm");
-        if (!h || !m) return null;
-        let hour = parseInt(h.value);
-        const min = parseInt(m.value);
-        if (!use24Hour) {
-          const ampm = a ? a.value : "AM";
-          if (ampm === "PM" && hour !== 12) hour += 12;
-          if (ampm === "AM" && hour === 12) hour = 0;
-        }
-        const now = new Date();
-        return new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          hour,
-          min,
-          0,
-          0,
-        );
-      }
-
-      function readWorkHours() {
-        const h = document.getElementById("workHours_hour");
-        const m = document.getElementById("workHours_minute");
-        if (!h || !m) return 0;
-        return parseInt(h.value) + parseInt(m.value) / 60;
-      }
-
-      function initSelectors() {
-        const ci = document.getElementById("clockInSelectors");
-        const wh = document.getElementById("workHoursSelectors");
-        ci.innerHTML = "";
-        wh.innerHTML = "";
-
-        // Clock In: use current time as default
-        const now = new Date();
-        let dh = now.getHours(),
-          dm = now.getMinutes(),
-          dampm = "AM";
-        if (!use24Hour) {
-          dampm = dh >= 12 ? "PM" : "AM";
-          dh = dh % 12;
-          if (dh === 0) dh = 12;
-        }
-        ci.appendChild(createTimeSelectors("clockIn", dh, dm, dampm));
-
-        // Working Hours
-        const row = document.createElement("span");
-        row.className = "time-row";
-        const hoursOpts = Array.from({ length: 25 }, (_, i) => ({
-          value: i,
-          label: i + "h",
-        }));
-        const minOpts = [0, 15, 30, 45].map((m) => ({
-          value: m,
-          label: m + "m",
-        }));
-        row.appendChild(createSelect("workHours_hour", hoursOpts, 8));
-        row.appendChild(createSelect("workHours_minute", minOpts, 30));
-        wh.appendChild(row);
-      }
-
-      // ═══════════════════════════════════════════
-      // BREAKS
-      // ═══════════════════════════════════════════
-      function addBreak() {
-        breakCount++;
-        const container = document.getElementById("breaksContainer");
-        const div = document.createElement("div");
-        div.className = "break-item";
-        div.id = "break-" + breakCount;
-
-        const idx = breakCount;
-        div.innerHTML = `<div class="break-header"><span class="break-tag">Break ${idx}</span><button class="break-remove" onclick="removeBreak(${idx})">✕</button></div>`;
-
-        const sRow = document.createElement("div");
-        sRow.style.marginBottom = "8px";
-        const sLabel = document.createElement("span");
-        sLabel.style.cssText =
-          "font-size:0.7rem;color:var(--text3);display:block;margin-bottom:4px;";
-        sLabel.textContent = "Start";
-        sRow.appendChild(sLabel);
-        sRow.appendChild(
-          createTimeSelectors(`break${idx}Start`, use24Hour ? 12 : 12, 0, "PM"),
-        );
-
-        const eRow = document.createElement("div");
-        const eLabel = document.createElement("span");
-        eLabel.style.cssText =
-          "font-size:0.7rem;color:var(--text3);display:block;margin-bottom:4px;";
-        eLabel.textContent = "End";
-        eRow.appendChild(eLabel);
-        eRow.appendChild(
-          createTimeSelectors(`break${idx}End`, use24Hour ? 12 : 12, 15, "PM"),
-        );
-
-        div.appendChild(sRow);
-        div.appendChild(eRow);
-        container.appendChild(div);
-      }
-
-      function removeBreak(idx) {
-        const el = document.getElementById("break-" + idx);
-        if (el) {
-          el.style.opacity = "0";
-          el.style.transform = "translateX(20px)";
-          el.style.transition = "all 0.2s";
-          setTimeout(() => el.remove(), 200);
-        }
-      }
-
-      // ═══════════════════════════════════════════
-      // CALCULATE
-      // ═══════════════════════════════════════════
-      function calculate() {
-        clockInTime = readTime("clockIn");
-        if (!clockInTime) {
-          showToast("Invalid clock-in time!", "danger");
-          return;
-        }
-
-        let totalBreakMs = 0;
-        const breakItems = document.querySelectorAll(".break-item");
-        const bCount = breakItems.length;
-
-        for (let i = 1; i <= breakCount; i++) {
-          const bEl = document.getElementById("break-" + i);
-          if (!bEl || bEl.style.opacity === "0") continue;
-          const bs = readTime(`break${i}Start`);
-          const be = readTime(`break${i}End`);
-          if (!bs || !be) continue;
-          if (be <= bs) {
-            showToast(`Break ${i}: End must be after Start`, "danger");
-            return;
-          }
-          totalBreakMs += be - bs;
-        }
-
-        const wh = readWorkHours();
-        if (wh <= 0) {
-          showToast("Working hours must be > 0", "danger");
-          return;
-        }
-
-        totalWorkMs = wh * 3600000;
-        requiredEndTime = new Date(
-          clockInTime.getTime() + totalWorkMs + totalBreakMs,
-        );
-
-        // Update UI
-        document.getElementById("endTime").textContent =
-          formatTime(requiredEndTime);
-        const bMin = Math.floor(totalBreakMs / 60000);
-        document.getElementById("breakTime").textContent =
-          bMin > 0 ? `${Math.floor(bMin / 60)}h ${bMin % 60}m` : "0m";
-
-        alertShownEnd = false;
-        alertShown15 = false;
-        alertShown30 = false;
-        lastHourAlert = -1;
-
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(updateTimer, 1000);
-        updateTimer();
-
-        showToast("Tracking started! 🚀", "success");
-        logNotif(
-          "🚀",
-          `Session started. End time: ${formatTime(requiredEndTime)}`,
-        );
-      }
-
-      // ═══════════════════════════════════════════
-      // TIMER
-      // ═══════════════════════════════════════════
-      const RING_CIRC = 301.6;
-
-      function updateTimer() {
-        if (!requiredEndTime) return;
-        const now = new Date();
-        const diff = requiredEndTime - now;
-        const elapsed = now - clockInTime;
-        const total = requiredEndTime - clockInTime;
-        const progress = Math.min(1, Math.max(0, elapsed / total));
-
-        // Elapsed
-        document.getElementById("elapsedTime").textContent = fmtDuration(
-          Math.max(0, elapsed),
-        );
-
-        // Ring
-        const ring = document.getElementById("progressRing");
-        ring.style.strokeDashoffset = RING_CIRC * (1 - progress);
-
-        const tv = document.getElementById("remainingTime");
-        const tl = document.getElementById("timerLabel");
-
-        if (diff < 0) {
-          // Overtime
-          const ot = -diff;
-          tv.textContent = fmtDuration(ot);
-          tv.className = "timer-value overtime pulsing";
-          tl.textContent = "🔴 Overtime — Go Home!";
-          document.getElementById("overTime").textContent = fmtDuration(ot);
-          ring.style.stroke = "var(--danger)";
-
-          if (!alertShownEnd) {
-            alertShownEnd = true;
-            sendNotification(
-              "⏰ Time Up!",
-              "Your working hours are complete. Head home!",
-            );
-            showToast("⏰ Time up! Go home!", "danger");
-            logNotif("⏰", "Working hours complete!");
-            playBeep();
-            saveSession();
-          }
-        } else {
-          document.getElementById("overTime").textContent = "--";
-          const mins = diff / 60000;
-
-          if (
-            mins <= 15 &&
-            !alertShown15 &&
-            document.getElementById("notif15").checked
-          ) {
-            alertShown15 = true;
-            sendNotification(
-              "⚠️ 15 Minutes Left",
-              "Almost done! Wrap up your work.",
-            );
-            showToast("⚠️ 15 minutes remaining", "warn");
-            logNotif("⚠️", "15 minutes remaining");
-            playBeep(440);
-          }
-          if (
-            mins <= 30 &&
-            !alertShown30 &&
-            document.getElementById("notif30").checked
-          ) {
-            alertShown30 = true;
-            sendNotification(
-              "⚠️ 30 Minutes Left",
-              "Half hour left in your session.",
-            );
-            showToast("⚠️ 30 minutes remaining", "warn");
-            logNotif("⚠️", "30 minutes remaining");
-          }
-
-          // Hourly check-in
-          if (document.getElementById("notifHourly").checked) {
-            const hoursElapsed = Math.floor(elapsed / 3600000);
-            if (hoursElapsed > 0 && hoursElapsed !== lastHourAlert) {
-              lastHourAlert = hoursElapsed;
-              sendNotification(
-                "📢 Hourly Check-in",
-                `${hoursElapsed} hour(s) elapsed. Keep going!`,
-              );
-              logNotif("📢", `${hoursElapsed}h elapsed`);
-            }
-          }
-
-          if (mins <= 15) {
-            tv.className = "timer-value urgent";
-            ring.style.stroke = "var(--warn)";
-          } else {
-            tv.className = "timer-value";
-            ring.style.stroke = "var(--accent)";
-          }
-          tv.textContent = fmtSec(Math.floor(diff / 1000));
-          tl.textContent = "Remaining Time";
-        }
-      }
-
-      function fmtSec(totalSec) {
-        const h = Math.floor(totalSec / 3600);
-        const m = Math.floor((totalSec % 3600) / 60);
-        const s = totalSec % 60;
-        return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-      }
-
-      function fmtDuration(ms) {
-        const s = Math.floor(ms / 1000);
-        const h = Math.floor(s / 3600);
-        const m = Math.floor((s % 3600) / 60);
-        const sec = s % 60;
-        return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
-      }
-
-      function formatTime(date) {
-        let h = date.getHours(),
-          m = date.getMinutes();
-        if (use24Hour)
-          return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
-        const ap = h >= 12 ? "PM" : "AM";
-        h = h % 12;
-        if (h === 0) h = 12;
-        return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${ap}`;
-      }
-
-      // ═══════════════════════════════════════════
-      // NOTIFICATIONS
-      // ═══════════════════════════════════════════
-      function requestNotifPerm() {
-        if (!("Notification" in window)) {
-          showToast("Notifications not supported", "danger");
-          return;
-        }
-        Notification.requestPermission().then((p) => {
-          if (p === "granted") {
-            showToast("Notifications enabled! 🔔", "success");
-            document.getElementById("notifBtn").textContent = "🔔";
-          } else showToast("Notification permission denied", "warn");
-        });
-      }
-      function sendNotification(title, body) {
-        if (Notification.permission === "granted")
-          new Notification(title, { body, icon: "⏱" });
-      }
-
-      function playBeep(freq = 520) {
-        if (!document.getElementById("soundAlert").checked) return;
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.frequency.value = freq;
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-          osc.start(ctx.currentTime);
-          osc.stop(ctx.currentTime + 0.8);
-        } catch (e) {}
-      }
-
-      function saveNotifSettings() {}
-
-      // ═══════════════════════════════════════════
-      // NOTIFICATION LOG
-      // ═══════════════════════════════════════════
-      function logNotif(icon, text) {
-        const log = loadJSON(STORAGE.notifLog, []);
-        log.unshift({ icon, text, time: new Date().toLocaleTimeString() });
-        if (log.length > 20) log.pop();
-        saveJSON(STORAGE.notifLog, log);
-        renderNotifLog();
-      }
-      function renderNotifLog() {
-        const el = document.getElementById("notifLog");
-        const log = loadJSON(STORAGE.notifLog, []);
-        if (!log.length) {
-          el.innerHTML =
-            '<div class="history-empty" style="padding:20px 0;">No alerts yet.</div>';
-          return;
-        }
-        el.innerHTML = log
-          .map(
-            (n) => `
-    <div class="notif-item">
-      <span class="notif-icon">${n.icon}</span>
-      <span class="notif-text">${n.text}</span>
-      <span class="notif-time">${n.time}</span>
-    </div>`,
-          )
-          .join("");
-      }
-
-      // ═══════════════════════════════════════════
-      // HISTORY
-      // ═══════════════════════════════════════════
-      function saveSession() {
-        if (!clockInTime || !requiredEndTime) return;
-        const history = loadJSON(STORAGE.history, []);
-        const now = new Date();
-        const ot = now > requiredEndTime;
-        history.unshift({
-          date: now.toLocaleDateString(),
-          clockIn: formatTime(clockInTime),
-          endTime: formatTime(requiredEndTime),
-          actualEnd: formatTime(now),
-          overtime: ot,
-          breakMs: totalWorkMs,
-          note: document.getElementById("noteInput").value || "",
-        });
-        if (history.length > 60) history.pop();
-        saveJSON(STORAGE.history, history);
-        renderHistory();
-      }
-
-      function renderHistory() {
-        const list = document.getElementById("historyList");
-        const history = loadJSON(STORAGE.history, []);
-        if (!history.length) {
-          list.innerHTML =
-            '<div class="history-empty">🕐 No sessions recorded yet.<br>Hit Calculate to start tracking!</div>';
-          return;
-        }
-        list.innerHTML = history
-          .map(
-            (h) => `
-    <div class="history-item">
-      <div class="history-dot ${h.overtime ? "overtime" : "on-time"}"></div>
-      <div class="history-details">
-        <div class="history-date">${h.date}${h.note ? " · " + h.note : ""}</div>
-        <div class="history-times">In: ${h.clockIn} → Out: ${h.endTime}</div>
+    <div class="widget-card">
+      <div class="widget-header">
+        <div class="widget-title"><span class="widget-title-icon">▶️</span> YouTube Player</div>
+        <button class="widget-toggle" onclick="toggleWidget('yt')">Hide</button>
       </div>
-      <span class="history-badge ${h.overtime ? "badge-overtime" : "badge-on-time"}">${h.overtime ? "Overtime" : "On Time"}</span>
-    </div>`,
-          )
-          .join("");
-      }
+      <div class="widget-body" id="yt">
+        <input id="ytInput" placeholder="Paste YouTube URL or video ID here..." oninput="debounceYT(this.value)"/>
+        <iframe id="ytFrame" src="about:blank" allowfullscreen allow="autoplay; encrypted-media" style="display:none"></iframe>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;">🎵 Lo-fi, focus music, or anything you like while you work.</div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="loadYT('jfKfPfyJRdk')">Lo-fi Hip Hop</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="loadYT('5qap5aO4i9A')">Chillhop</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="loadYT('DWcJFNfaw9c')">Jazz Cafe</button>
+        </div>
+      </div>
+    </div>
 
-      function clearHistory() {
-        if (!confirm("Clear all session history?")) return;
-        saveJSON(STORAGE.history, []);
-        renderHistory();
-        showToast("History cleared", "warn");
-      }
+    <div class="widget-card">
+      <div class="widget-header">
+        <div class="widget-title"><span class="widget-title-icon">🐍</span> Snake Break</div>
+        <button class="widget-toggle" onclick="toggleWidget('game')">Hide</button>
+      </div>
+      <div class="widget-body" id="game">
+        <div class="game-score">Score: <span id="snakeScore">0</span> &nbsp;|&nbsp; Best: <span id="snakeBest">0</span></div>
+        <canvas id="gameCanvas" width="280" height="280"></canvas>
+        <div class="game-controls">
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;" id="gameBtn" onclick="toggleGame()">▶ Start</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;" onclick="resetGame()">↺ Reset</button>
+        </div>
+        <div class="mobile-dpad">
+          <div></div><button class="dpad-btn" onclick="setDir(0,-1)">▲</button><div></div>
+          <button class="dpad-btn" onclick="setDir(-1,0)">◀</button>
+          <button class="dpad-btn" onclick="setDir(0,1)">▼</button>
+          <button class="dpad-btn" onclick="setDir(1,0)">▶</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">Arrow keys or WASD · Space to pause</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-      // ═══════════════════════════════════════════
-      // STATS
-      // ═══════════════════════════════════════════
-      function renderStats() {
-        const history = loadJSON(STORAGE.history, []);
-        document.getElementById("statTotal").textContent = history.length;
-        const ot = history.filter((h) => h.overtime).length;
-        document.getElementById("statOnTime").textContent = history.length - ot;
-        document.getElementById("statOT").textContent = ot;
-        const totalBreak = history.reduce((a, h) => a + (h.breakMs || 0), 0);
-        const avgBreak = history.length
-          ? Math.round(totalBreak / history.length / 60000)
-          : 0;
-        document.getElementById("statAvgBreak").textContent = avgBreak + "m";
-        document.getElementById("statTotalBreak").textContent =
-          Math.round(totalBreak / 60000) + "m";
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SESSION STORAGE KEY (per day)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function todayKey(){
+  const d=new Date();
+  return`etime_session_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+}
 
-        // Most common clock-in
-        const cis = history.map((h) => h.clockIn);
-        const freq = {};
-        cis.forEach((t) => {
-          freq[t] = (freq[t] || 0) + 1;
-        });
-        const best = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
-        document.getElementById("statCommonIn").textContent = best
-          ? best[0]
-          : "--";
+function saveSession(){
+  if(!requiredEnd||!workStart)return;
+  const breaks=[];
+  document.querySelectorAll('.break-item').forEach(item=>{
+    const id=item.id.replace('break-','');
+    const bs=readTime(`break${id}Start`);
+    const be=readTime(`break${id}End`);
+    if(bs&&be)breaks.push({startMs:bs.getTime(),endMs:be.getTime()});
+  });
+  const data={
+    clockInMs:workStart.getTime(),
+    requiredEndMs:requiredEnd.getTime(),
+    totalWorkMs:totalWorkMs,
+    breaks:breaks,
+    use24:use24,
+    savedAt:Date.now()
+  };
+  localStorage.setItem(todayKey(),JSON.stringify(data));
+}
 
-        drawWeekChart(history);
-      }
+function loadSession(){
+  try{
+    const raw=localStorage.getItem(todayKey());
+    if(!raw)return null;
+    return JSON.parse(raw);
+  }catch(e){return null;}
+}
 
-      function drawWeekChart(history) {
-        const canvas = document.getElementById("weekChart");
-        const ctx = canvas.getContext("2d");
-        canvas.width = canvas.offsetWidth * devicePixelRatio;
-        canvas.height = 120 * devicePixelRatio;
-        ctx.scale(devicePixelRatio, devicePixelRatio);
-        const w = canvas.offsetWidth,
-          h = 120;
-        ctx.clearRect(0, 0, w, h);
+function clearSession(){
+  localStorage.removeItem(todayKey());
+}
 
-        const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const counts = new Array(7).fill(0);
-        const now = new Date();
-        history.forEach((entry) => {
-          const d = new Date(entry.date);
-          const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
-          if (diff < 7) {
-            const dow = (d.getDay() + 6) % 7;
-            counts[dow]++;
-          }
-        });
-        const max = Math.max(...counts, 1);
-        const barW = w / 7 - 8;
+function resetSession(){
+  if(!confirm('Reset today\'s session? This will clear all timer data for today.'))return;
+  clearSession();
+  requiredEnd=null;workStart=null;totalWorkMs=0;alertDone=false;
+  if(timerInterval)clearInterval(timerInterval);timerInterval=null;
+  document.getElementById('timerDisplay').style.display='none';
+  document.getElementById('resultsPanel').style.display='none';
+  document.getElementById('resetBtn').style.display='none';
+  setBadge(false);
+  // Clear breaks UI
+  document.getElementById('breakTimeContainer').innerHTML='';
+  breakCount=0;
+  document.getElementById('removeBreakBtn').style.display='none';
+  initSelectors();
+  toast('Session Reset','Today\'s session has been cleared. Start fresh!','info',3000);
+}
 
-        const accent = getComputedStyle(document.documentElement)
-          .getPropertyValue("--accent")
-          .trim();
-        const text3 = getComputedStyle(document.documentElement)
-          .getPropertyValue("--text3")
-          .trim();
+function setBadge(active){
+  const b=document.getElementById('sessionBadge');
+  const r=document.getElementById('resetBtn');
+  if(active){
+    b.textContent='● Session Active';b.className='session-badge';
+    r.style.display='flex';
+  }else{
+    b.textContent='● No Session';b.className='session-badge inactive';
+    r.style.display='none';
+  }
+}
 
-        days.forEach((day, i) => {
-          const x = i * (w / 7) + 4;
-          const barH = (counts[i] / max) * (h - 30);
-          const y = h - 20 - barH;
-          ctx.fillStyle = counts[i] > 0 ? accent : "rgba(255,255,255,0.08)";
-          ctx.beginPath();
-          ctx.roundRect(x, y, barW, barH, 4);
-          ctx.fill();
-          ctx.fillStyle = text3;
-          ctx.font = `${10 * devicePixelRatio}px sans-serif`;
-          ctx.textAlign = "center";
-          ctx.fillText(day, x + barW / 2, h - 4);
-        });
-      }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LIVE CLOCK
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updateClock(){
+  const n=new Date();
+  let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  let str;
+  if(use24){
+    str=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }else{
+    const ap=h>=12?'PM':'AM';h=h%12||12;
+    str=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ap}`;
+  }
+  document.getElementById('liveClock').textContent=str;
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('liveDate').textContent=`${days[n.getDay()]}, ${months[n.getMonth()]} ${n.getDate()} ${n.getFullYear()}`;
+}
+setInterval(updateClock,1000);
 
-      // ═══════════════════════════════════════════
-      // TOAST
-      // ═══════════════════════════════════════════
-      function showToast(msg, type = "success") {
-        const container = document.getElementById("toast-container");
-        const icons = { success: "✅", warn: "⚠️", danger: "🚨" };
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => {
-          toast.style.animation = "slideOut 0.3s ease forwards";
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TOAST
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toast(title,msg,type='info',duration=4000){
+  const c=document.getElementById('toastContainer');
+  const icons={success:'✓',info:'ℹ',warn:'⚠',error:'✕'};
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ'}</div><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div><button class="toast-close" onclick="removeToast(this.parentElement)">×</button>`;
+  c.appendChild(el);
+  if(duration>0)setTimeout(()=>removeToast(el),duration);
+}
+function removeToast(el){
+  if(!el||!el.parentElement)return;
+  el.classList.add('removing');setTimeout(()=>el.remove(),300);
+}
 
-      // ═══════════════════════════════════════════
-      // FORMAT CHANGE
-      // ═══════════════════════════════════════════
-      function onFormatChange() {
-        use24Hour = document.getElementById("toggleFormat").checked;
-        initSelectors();
-      }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FORMAT & SELECTORS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let use24=false;
+const toggleFormatEl=document.getElementById('toggleFormat');
+toggleFormatEl.checked=true; // starts as 12h (checked = 12h label right side)
 
-      // ═══════════════════════════════════════════
-      // INIT
-      // ═══════════════════════════════════════════
-      loadTheme();
-      initSelectors();
-      renderHistory();
-      renderNotifLog();
-      initWallpaperUI();
-      if (bgSettings.auto) saveBgSettings();
+function getHours(){
+  if(use24)return Array.from({length:24},(_,i)=>({value:i,label:i.toString().padStart(2,'0')}));
+  return Array.from({length:12},(_,i)=>({value:i+1,label:(i+1).toString().padStart(2,'0')}));
+}
+function getMins(step=1){
+  const r=[];for(let i=0;i<60;i+=step)r.push({value:i,label:i.toString().padStart(2,'0')});return r;
+}
 
-      // Request notification permission proactively
-      if ("Notification" in window && Notification.permission === "default") {
-        // Gentle — wait for user interaction
-      }
-    </script>
-  </body>
+function mkSelect(id,opts,val,mini=false){
+  const s=document.createElement('select');s.id=id;s.className='custom-select';
+  if(mini)s.style.minWidth='auto';
+  opts.forEach(o=>{
+    const op=document.createElement('option');op.value=o.value;op.textContent=o.label;
+    if(String(o.value)===String(val))op.selected=true;
+    s.appendChild(op);
+  });
+  s.addEventListener('change',()=>s.classList.add('active'));
+  return s;
+}
+
+function mkAMPM(prefix,def='AM'){
+  const wrap=document.createElement('div');wrap.className='ampm-toggle';wrap.id=prefix+'_ampm';
+  ['AM','PM'].forEach(v=>{
+    const b=document.createElement('button');b.type='button';
+    b.className='ampm-btn'+(v===def?' selected':'');
+    b.textContent=v;b.dataset.val=v;
+    b.onclick=()=>{wrap.querySelectorAll('.ampm-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');};
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+
+function getAMPM(prefix){
+  const w=document.getElementById(prefix+'_ampm');
+  if(!w)return'AM';
+  const sel=w.querySelector('.ampm-btn.selected');
+  return sel?sel.dataset.val:'AM';
+}
+
+function mkTimeRow(prefix,dh=8,dm=30,da='AM'){
+  const row=document.createElement('div');row.className='time-row';
+  row.appendChild(mkSelect(prefix+'_hour',getHours(),dh,true));
+  const sep=document.createElement('span');sep.className='sep';sep.textContent=':';
+  row.appendChild(sep);
+  row.appendChild(mkSelect(prefix+'_minute',getMins(),dm,true));
+  if(!use24){
+    const sp=document.createElement('span');sp.style.marginLeft='4px';
+    sp.appendChild(mkAMPM(prefix,da));row.appendChild(sp);
+  }
+  return row;
+}
+
+function readTime(prefix){
+  const hs=document.getElementById(prefix+'_hour');
+  const ms=document.getElementById(prefix+'_minute');
+  if(!hs||!ms)return null;
+  let h=parseInt(hs.value),m=parseInt(ms.value);
+  if(!use24){
+    const ap=getAMPM(prefix);
+    if(ap==='PM'&&h!==12)h+=12;
+    if(ap==='AM'&&h===12)h=0;
+  }
+  const n=new Date();
+  return new Date(n.getFullYear(),n.getMonth(),n.getDate(),h,m,0,0);
+}
+
+function readWorkHours(){
+  const h=document.getElementById('workHours_hour');
+  const m=document.getElementById('workHours_minute');
+  return h&&m?parseInt(h.value)+parseInt(m.value)/60:0;
+}
+
+// Convert 24h absolute hour to selector-compatible values for current format
+function hourToSelector(absHour){
+  if(use24)return{h:absHour,ampm:'AM'};
+  const ampm=absHour>=12?'PM':'AM';
+  const h=absHour%12||12;
+  return{h,ampm};
+}
+
+function initSelectors(clockInAbsHour=null, clockInMin=null, workH=8, workM=30){
+  const ci=document.getElementById('clockInSelectors');
+  const wh=document.getElementById('workHoursSelectors');
+  ci.innerHTML='';wh.innerHTML='';
+
+  let dh,dm,da;
+  if(clockInAbsHour!==null){
+    const converted=hourToSelector(clockInAbsHour);
+    dh=converted.h;da=converted.ampm;dm=clockInMin||0;
+  }else{
+    const now=new Date();
+    const converted=hourToSelector(now.getHours());
+    dh=converted.h;da=converted.ampm;dm=now.getMinutes()<30?0:30;
+  }
+  ci.appendChild(mkTimeRow('clockIn',dh,dm,da));
+
+  const wrow=document.createElement('div');wrow.className='time-row';
+  const hopts=Array.from({length:25},(_,i)=>({value:i,label:i.toString()}));
+  const mopts=[{value:0,label:'00'},{value:15,label:'15'},{value:30,label:'30'},{value:45,label:'45'}];
+  wrow.appendChild(mkSelect('workHours_hour',hopts,workH,true));
+  const sp=document.createElement('span');sp.className='sep';sp.textContent='h';wrow.appendChild(sp);
+  wrow.appendChild(mkSelect('workHours_minute',mopts,workM,true));
+  const sp2=document.createElement('span');sp2.className='sep';sp2.textContent='m';wrow.appendChild(sp2);
+  wh.appendChild(wrow);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BREAKS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let breakCount=0;
+
+function addBreakAt(startAbsH=12,startM=0,startAmpm='PM',endAbsH=12,endM=30,endAmpm='PM'){
+  breakCount++;
+  const bc=document.getElementById('breakTimeContainer');
+  const div=document.createElement('div');div.className='break-item';div.id='break-'+breakCount;
+  const hdr=document.createElement('div');hdr.className='break-item-header';hdr.textContent='Break '+breakCount;div.appendChild(hdr);
+  const rb=document.createElement('button');rb.className='break-remove';rb.innerHTML='✕';
+  const capturedId=breakCount;rb.onclick=()=>removeSpecificBreak(capturedId);div.appendChild(rb);
+
+  const sConv=hourToSelector(startAbsH);
+  const eConv=hourToSelector(endAbsH);
+
+  const sl=document.createElement('div');sl.style.marginBottom='8px';
+  sl.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;">Start</div>';
+  sl.appendChild(mkTimeRow(`break${breakCount}Start`,sConv.h,startM,sConv.ampm));
+  div.appendChild(sl);
+
+  const el=document.createElement('div');
+  el.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:6px;margin-top:8px;text-transform:uppercase;letter-spacing:.8px;font-weight:600;">End</div>';
+  el.appendChild(mkTimeRow(`break${breakCount}End`,eConv.h,endM,eConv.ampm));
+  div.appendChild(el);
+
+  bc.appendChild(div);
+  document.getElementById('removeBreakBtn').style.display='inline-flex';
+  return breakCount;
+}
+
+function addBreak(){
+  addBreakAt(12,0,'PM',12,30,'PM');
+  toast('Break Added','Break '+breakCount+' has been added.','info',2500);
+}
+
+function removeBreak(){
+  if(breakCount>0){
+    const last=document.getElementById('break-'+breakCount);
+    if(last)last.remove();breakCount--;
+    toast('Break Removed','Break removed.','warn',2000);
+  }
+  if(breakCount===0)document.getElementById('removeBreakBtn').style.display='none';
+}
+
+function removeSpecificBreak(id){
+  const el=document.getElementById('break-'+id);
+  if(el)el.remove();
+  if(id===breakCount)breakCount--;
+  if(document.querySelectorAll('.break-item').length===0)
+    document.getElementById('removeBreakBtn').style.display='none';
+}
+
+// Rebuild break selectors with new format (used on 12/24 toggle)
+function rebuildBreaksWithFormat(savedBreaks){
+  document.getElementById('breakTimeContainer').innerHTML='';
+  breakCount=0;
+  document.getElementById('removeBreakBtn').style.display='none';
+  if(!savedBreaks||!savedBreaks.length)return;
+  savedBreaks.forEach(b=>{
+    const bs=new Date(b.startMs),be=new Date(b.endMs);
+    addBreakAt(bs.getHours(),bs.getMinutes(),'AM',be.getHours(),be.getMinutes(),'AM');
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FORMAT TOGGLE — applies everywhere
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+toggleFormatEl.addEventListener('change',()=>{
+  use24=!toggleFormatEl.checked;
+  localStorage.setItem('etime_use24',use24?'1':'0');
+
+  // Snapshot current clock-in & work hours before rebuilding
+  const ciTime=readTime('clockIn');
+  const wH=parseInt(document.getElementById('workHours_hour')?.value||8);
+  const wM=parseInt(document.getElementById('workHours_minute')?.value||30);
+
+  // Snapshot breaks before rebuild
+  const currentBreaks=[];
+  document.querySelectorAll('.break-item').forEach(item=>{
+    const id=item.id.replace('break-','');
+    const bs=readTime(`break${id}Start`);
+    const be=readTime(`break${id}End`);
+    if(bs&&be)currentBreaks.push({startMs:bs.getTime(),endMs:be.getTime()});
+  });
+
+  // Rebuild all selectors
+  initSelectors(ciTime?ciTime.getHours():null, ciTime?ciTime.getMinutes():null, wH, wM);
+  rebuildBreaksWithFormat(currentBreaks);
+
+  // Refresh displayed results if session is active
+  if(requiredEnd){
+    document.getElementById('endTime').textContent=formatTime(requiredEnd);
+  }
+  updateClock();
+
+  toast('Format Updated',use24?'Switched to 24-hour format.':'Switched to 12-hour format.','info',2000);
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CALCULATE & TIMER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let timerInterval=null,requiredEnd=null,workStart=null,totalWorkMs=0,alertDone=false;
+
+function formatTime(d){
+  let h=d.getHours(),m=d.getMinutes();
+  if(use24)return`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  const ap=h>=12?'PM':'AM';h=h%12||12;
+  return`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${ap}`;
+}
+
+function msToHMS(ms){
+  let s=Math.floor(ms/1000);
+  const h=Math.floor(s/3600);s%=3600;
+  const m=Math.floor(s/60);s%=60;
+  return{h,m,s};
+}
+
+function calculate(){
+  const ci=readTime('clockIn');
+  if(!ci){toast('Missing Input','Please select a valid clock-in time.','error');return;}
+  let totalBreakMs=0;
+  document.querySelectorAll('.break-item').forEach(item=>{
+    const id=item.id.replace('break-','');
+    const bs=readTime(`break${id}Start`),be=readTime(`break${id}End`);
+    if(!bs||!be){toast('Invalid Break','Check break '+id+' times.','error');return;}
+    if(be<=bs){toast('Invalid Break','Break end must be after start (break '+id+').','error');return;}
+    totalBreakMs+=be-bs;
+  });
+  const wh=readWorkHours();
+  if(wh<=0){toast('Invalid Hours','Working hours must be greater than 0.','error');return;}
+
+  startTimer(ci.getTime(), wh*3600000, totalBreakMs);
+  saveSession();
+  toast('Calculated!',`Your day ends at ${formatTime(requiredEnd)}.`,'success',3500);
+}
+
+function startTimer(clockInMs, workMs, breakMs){
+  totalWorkMs=workMs;
+  workStart=new Date(clockInMs);
+  requiredEnd=new Date(clockInMs+workMs+breakMs);
+  alertDone=false;
+
+  const tbm=Math.floor(breakMs/60000);
+  const bd=document.getElementById('breakTimeDisplay');
+  bd.textContent=tbm>0?`${Math.floor(tbm/60)}h ${tbm%60}m`:'None';
+
+  document.getElementById('endTime').textContent=formatTime(requiredEnd);
+  document.getElementById('resultsPanel').style.display='block';
+  document.getElementById('timerDisplay').style.display='block';
+  document.getElementById('overtimeItem').style.display='none';
+  document.getElementById('statusDisplay').textContent='Active';
+  document.getElementById('statusDisplay').className='result-value green';
+  setBadge(true);
+
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(tick,1000);tick();
+}
+
+function tick(){
+  if(!requiredEnd)return;
+  const now=new Date();
+  const diff=requiredEnd-now;
+  const elapsed=now-workStart;
+  const tv=document.getElementById('remainingTime');
+  const pf=document.getElementById('progressFill');
+  const ov=document.getElementById('overtimeItem');
+  const sd=document.getElementById('statusDisplay');
+
+  if(diff<0){
+    if(!alertDone){
+      alertDone=true;
+      toast('Time Up! 🎉','Your workday is done. Great job today — time to head home!','success',0);
+    }
+    const od=msToHMS(-diff);
+    ov.style.display='block';
+    document.getElementById('overTime').textContent=`${od.h}h ${od.m}m ${od.s}s`;
+    tv.textContent="Time's up — head home! 🏠";
+    tv.className='timer-value done';
+    pf.style.width='100%';pf.className='progress-fill overtime';
+    sd.textContent='Done';sd.className='result-value green';
+  }else{
+    const{h,m,s}=msToHMS(diff);
+    tv.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    tv.className='timer-value accent';
+    const pct=Math.min(100,Math.max(0,(elapsed/(totalWorkMs+1))*100));
+    pf.style.width=pct+'%';pf.className='progress-fill'+(pct>90?' overtime':'');
+    sd.textContent=diff<1800000?'Almost done!':'Active';
+    sd.className=diff<1800000?'result-value amber':'result-value green';
+    if(diff<1800000&&diff>1799000)toast('Almost There ⏰','Less than 30 minutes left in your workday!','warn',5000);
+    if(diff<300000&&diff>299000)toast('5 Minutes Left ⚡','Wrap up what you\'re doing — almost home time!','warn',5000);
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WIDGET TOGGLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleWidget(id){
+  const body=document.getElementById(id);
+  const btn=body.previousElementSibling.querySelector('.widget-toggle');
+  const hidden=body.classList.toggle('hidden');
+  btn.textContent=hidden?'Show':'Hide';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// NOTES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const saved=localStorage.getItem('etimeNotes');
+if(saved)document.getElementById('notesArea').value=saved;
+function saveNotes(){localStorage.setItem('etimeNotes',document.getElementById('notesArea').value);toast('Notes Saved','Your notes have been saved.','success',2000);}
+function clearNotes(){document.getElementById('notesArea').value='';localStorage.removeItem('etimeNotes');toast('Notes Cleared','Notes cleared.','info',2000);}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// YOUTUBE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let ytTimer;
+function debounceYT(v){clearTimeout(ytTimer);ytTimer=setTimeout(()=>loadFromInput(v),600);}
+function extractYTId(url){
+  url=url.trim();
+  const m=url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
+  if(m)return m[1];if(/^[\w-]{11}$/.test(url))return url;return null;
+}
+function loadFromInput(v){const id=extractYTId(v);if(id)loadYT(id);}
+function loadYT(id){
+  const f=document.getElementById('ytFrame');
+  f.src=`https://www.youtube-nocookie.com/embed/${id}?autoplay=0`;f.style.display='block';
+  const body=document.getElementById('yt');
+  if(body.classList.contains('hidden')){body.classList.remove('hidden');body.previousElementSibling.querySelector('.widget-toggle').textContent='Hide';}
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SNAKE GAME
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const cv=document.getElementById('gameCanvas');
+const ctx=cv.getContext('2d');
+const CELL=20,COLS=14,ROWS=14;
+let snake,dir,nextDir,food,score,best=0,running=false,gameLoop;
+
+function initSnake(){
+  snake=[{x:7,y:7},{x:6,y:7},{x:5,y:7}];
+  dir={x:1,y:0};nextDir={x:1,y:0};food=randFood();score=0;
+  document.getElementById('snakeScore').textContent=0;drawGame();
+}
+function randFood(){
+  let f;do{f={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
+  while(snake.some(s=>s.x===f.x&&s.y===f.y));return f;
+}
+function drawGame(){
+  ctx.fillStyle='#0a0c12';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='rgba(42,47,66,0.5)';ctx.lineWidth=0.5;
+  for(let i=0;i<=COLS;i++){ctx.beginPath();ctx.moveTo(i*CELL,0);ctx.lineTo(i*CELL,ROWS*CELL);ctx.stroke();}
+  for(let i=0;i<=ROWS;i++){ctx.beginPath();ctx.moveTo(0,i*CELL);ctx.lineTo(COLS*CELL,i*CELL);ctx.stroke();}
+  ctx.fillStyle='#f87171';ctx.beginPath();ctx.arc(food.x*CELL+CELL/2,food.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(248,113,113,0.3)';ctx.beginPath();ctx.arc(food.x*CELL+CELL/2,food.y*CELL+CELL/2,CELL/2+3,0,Math.PI*2);ctx.fill();
+  snake.forEach((seg,i)=>{
+    ctx.fillStyle=i===0?'#4f8eff':`rgba(79,142,255,${Math.max(0.3,1-i*0.07)})`;
+    ctx.beginPath();ctx.roundRect(seg.x*CELL+1,seg.y*CELL+1,CELL-2,CELL-2,3);ctx.fill();
+  });
+}
+function gameStep(){
+  dir=nextDir;const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(s=>s.x===head.x&&s.y===head.y)){endGame();return;}
+  snake.unshift(head);
+  if(head.x===food.x&&head.y===food.y){
+    score++;if(score>best){best=score;document.getElementById('snakeBest').textContent=best;}
+    document.getElementById('snakeScore').textContent=score;food=randFood();
+  }else snake.pop();
+  drawGame();
+}
+function endGame(){
+  running=false;clearInterval(gameLoop);document.getElementById('gameBtn').textContent='▶ Start';
+  ctx.fillStyle='rgba(248,113,113,0.3)';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#f87171';ctx.font='bold 18px DM Sans';ctx.textAlign='center';
+  ctx.fillText('Game Over!',cv.width/2,cv.height/2-10);
+  ctx.fillStyle='#6b7594';ctx.font='13px DM Sans';ctx.fillText('Score: '+score,cv.width/2,cv.height/2+16);
+  if(score>0)toast('Game Over! 🐍',`You scored ${score} point${score!==1?'s':''}.${score===best&&score>0?' New best!':''}`,'info',3000);
+}
+function toggleGame(){
+  if(!snake)initSnake();
+  if(running){running=false;clearInterval(gameLoop);document.getElementById('gameBtn').textContent='▶ Resume';}
+  else{running=true;gameLoop=setInterval(gameStep,150);document.getElementById('gameBtn').textContent='⏸ Pause';}
+}
+function resetGame(){running=false;clearInterval(gameLoop);document.getElementById('gameBtn').textContent='▶ Start';initSnake();}
+function setDir(x,y){if((x!==0&&dir.x===0)||(y!==0&&dir.y===0))nextDir={x,y};}
+document.addEventListener('keydown',e=>{
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d',' '].includes(e.key))e.preventDefault();
+  if(e.key==='ArrowUp'||e.key==='w')setDir(0,-1);if(e.key==='ArrowDown'||e.key==='s')setDir(0,1);
+  if(e.key==='ArrowLeft'||e.key==='a')setDir(-1,0);if(e.key==='ArrowRight'||e.key==='d')setDir(1,0);
+  if(e.key===' ')toggleGame();
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BOOT — restore format + session
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(function boot(){
+  // Restore 12/24 preference
+  const savedFmt=localStorage.getItem('etime_use24');
+  if(savedFmt==='1'){use24=true;toggleFormatEl.checked=false;}
+  else{use24=false;toggleFormatEl.checked=true;}
+
+  // Try restore today's session
+  const sess=loadSession();
+  if(sess){
+    const clockInDate=new Date(sess.clockInMs);
+    const workH=Math.floor(sess.totalWorkMs/3600000);
+    const workM=Math.round((sess.totalWorkMs%3600000)/60000);
+    const breakMs=sess.requiredEndMs-sess.clockInMs-sess.totalWorkMs;
+
+    // Rebuild selectors with saved clock-in
+    initSelectors(clockInDate.getHours(),clockInDate.getMinutes(),workH,workM);
+
+    // Rebuild breaks
+    document.getElementById('breakTimeContainer').innerHTML='';breakCount=0;
+    if(sess.breaks&&sess.breaks.length){
+      sess.breaks.forEach(b=>{
+        const bs=new Date(b.startMs),be=new Date(b.endMs);
+        addBreakAt(bs.getHours(),bs.getMinutes(),'AM',be.getHours(),be.getMinutes(),'AM');
+      });
+      document.getElementById('removeBreakBtn').style.display='inline-flex';
+    }
+
+    // Restore timer state
+    startTimer(sess.clockInMs,sess.totalWorkMs,breakMs);
+    toast('Session Restored','Your session from earlier today has been restored.','success',4000);
+  }else{
+    initSelectors();
+    toast('Welcome!','ETimeTracker is ready. Set your clock-in and hours to get started.','info',4000);
+  }
+
+  initSnake();
+  updateClock();
+})();
+</script>
+</body>
 </html>
